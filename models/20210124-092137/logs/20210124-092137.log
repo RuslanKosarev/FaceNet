@@ -1,0 +1,416 @@
+2021-01-24 09:31:24.948 | INFO     | facenet.dataset:__init__:179 - Database
+/media/a/datasets/vggface2/train_frcnnv3extracted_160
+h5 file /media/a/datasets/vggface2/train_frcnnv3extracted_160_20190727-080213.h5
+Number of classes 8631 
+Number of images 3024116
+Minimal number of images in class 75
+Maximal number of images in class 803
+
+2021-01-24 09:31:47.676 | INFO     | facenet.dataset:tf_dataset_api:41 - 
+<PrefetchDataset shapes: ((None, 160, 160, None), (None,)), types: (tf.uint8, tf.int32)>
+batch size: 100
+buffer size: 10
+cardinality: -1
+2021-01-24 09:32:05.857 | INFO     | facenet.dataset:__init__:179 - Database
+/media/a/datasets/megaface/megaface_frcnnv3extracted_160
+h5 file /media/a/datasets/megaface/megaface_frcnnv3extracted_160_20190727-080213.h5
+Number of classes 530 
+Number of images 26489
+Minimal number of images in class 45
+Maximal number of images in class 50
+
+2021-01-24 09:32:05.977 | INFO     | facenet.dataset:tf_dataset_api:41 - 
+<PrefetchDataset shapes: ((None, 160, 160, None), (None,)), types: (tf.uint8, tf.int64)>
+batch size: 100
+buffer size: None
+cardinality: 265
+2021-01-24 11:23:07.271 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 10
+2021-01-24 11:34:45.208 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.97739
+Equal error rate (EER): 0.07600
+
+Accuracy:  0.92669+-0.00284
+Precision: 0.93065+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.91993+-0.00567
+Specificity (TNR, 1-b type 2 error): 0.93328+-0.00080
+Threshold: 1.13131+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.97739
+Equal error rate (EER): 0.07600
+
+Accuracy:  0.77281+-0.00563
+Precision: 0.99818+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.54039+-0.01165
+Specificity (TNR, 1-b type 2 error): 0.99904+-0.00004
+Threshold: 0.70472+-0.00032
+
+elapsed_time: 615.5208194559673
+
+2021-01-24 13:29:32.155 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 20
+2021-01-24 13:40:51.936 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.98659
+Equal error rate (EER): 0.05715
+
+Accuracy:  0.94411+-0.00248
+Precision: 0.95131+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.93453+-0.00418
+Specificity (TNR, 1-b type 2 error): 0.95344+-0.00108
+Threshold: 1.17172+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.98659
+Equal error rate (EER): 0.05715
+
+Accuracy:  0.82403+-0.00376
+Precision: 0.99846+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.64426+-0.00755
+Specificity (TNR, 1-b type 2 error): 0.99904+-0.00005
+Threshold: 0.78722+-0.00034
+
+elapsed_time: 613.7862706409069
+
+2021-01-24 15:41:01.584 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 30
+2021-01-24 15:52:33.349 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.98660
+Equal error rate (EER): 0.05594
+
+Accuracy:  0.94471+-0.00324
+Precision: 0.95498+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.93183+-0.00656
+Specificity (TNR, 1-b type 2 error): 0.95724+-0.00047
+Threshold: 1.17172+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.98660
+Equal error rate (EER): 0.05594
+
+Accuracy:  0.83578+-0.00433
+Precision: 0.99848+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.66809+-0.00875
+Specificity (TNR, 1-b type 2 error): 0.99901+-0.00003
+Threshold: 0.80567+-0.00031
+
+elapsed_time: 612.8405505089322
+
+2021-01-24 18:04:45.182 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 40
+2021-01-24 18:16:36.860 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.98782
+Equal error rate (EER): 0.05407
+
+Accuracy:  0.94754+-0.00281
+Precision: 0.95255+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.94050+-0.00523
+Specificity (TNR, 1-b type 2 error): 0.95439+-0.00120
+Threshold: 1.13131+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.98782
+Equal error rate (EER): 0.05407
+
+Accuracy:  0.83099+-0.00618
+Precision: 0.99845+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.65840+-0.01255
+Specificity (TNR, 1-b type 2 error): 0.99901+-0.00005
+Threshold: 0.76594+-0.00031
+
+elapsed_time: 614.6193808950484
+
+2021-01-24 20:26:29.036 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 50
+2021-01-24 20:38:46.607 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.98703
+Equal error rate (EER): 0.05626
+
+Accuracy:  0.94501+-0.00278
+Precision: 0.95031+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.93755+-0.00574
+Specificity (TNR, 1-b type 2 error): 0.95228+-0.00059
+Threshold: 1.21212+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.98703
+Equal error rate (EER): 0.05626
+
+Accuracy:  0.82436+-0.00464
+Precision: 0.99842+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.64494+-0.00933
+Specificity (TNR, 1-b type 2 error): 0.99900+-0.00003
+Threshold: 0.80978+-0.00023
+
+elapsed_time: 614.7262686779723
+
+2021-01-24 22:45:41.703 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 60
+2021-01-24 22:58:31.654 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99740
+Equal error rate (EER): 0.02197
+
+Accuracy:  0.97876+-0.00137
+Precision: 0.98183+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.97499+-0.00281
+Specificity (TNR, 1-b type 2 error): 0.98243+-0.00021
+Threshold: 1.33333+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99740
+Equal error rate (EER): 0.02197
+
+Accuracy:  0.94556+-0.00339
+Precision: 0.99887+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.89063+-0.00688
+Specificity (TNR, 1-b type 2 error): 0.99902+-0.00002
+Threshold: 1.03182+-0.00025
+
+elapsed_time: 615.4562150429701
+
+2021-01-25 00:47:21.735 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 70
+2021-01-25 00:59:46.721 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99751
+Equal error rate (EER): 0.02149
+
+Accuracy:  0.97863+-0.00217
+Precision: 0.98042+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.97616+-0.00431
+Specificity (TNR, 1-b type 2 error): 0.98103+-0.00027
+Threshold: 1.33333+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99751
+Equal error rate (EER): 0.02149
+
+Accuracy:  0.94368+-0.00345
+Precision: 0.99886+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.88684+-0.00698
+Specificity (TNR, 1-b type 2 error): 0.99901+-0.00004
+Threshold: 1.02000+-0.00024
+
+elapsed_time: 618.2003293288872
+
+2021-01-25 02:46:56.840 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 80
+2021-01-25 02:59:28.876 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99727
+Equal error rate (EER): 0.02247
+
+Accuracy:  0.97783+-0.00089
+Precision: 0.97929+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.97571+-0.00259
+Specificity (TNR, 1-b type 2 error): 0.97990+-0.00159
+Threshold: 1.32929+-0.01212
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99727
+Equal error rate (EER): 0.02247
+
+Accuracy:  0.94377+-0.00431
+Precision: 0.99884+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.88703+-0.00877
+Specificity (TNR, 1-b type 2 error): 0.99900+-0.00004
+Threshold: 1.01238+-0.00026
+
+elapsed_time: 623.5419767790008
+
+2021-01-25 04:43:58.763 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 90
+2021-01-25 04:56:36.958 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99745
+Equal error rate (EER): 0.02099
+
+Accuracy:  0.97957+-0.00157
+Precision: 0.98325+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.97519+-0.00306
+Specificity (TNR, 1-b type 2 error): 0.98383+-0.00018
+Threshold: 1.29293+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99745
+Equal error rate (EER): 0.02099
+
+Accuracy:  0.94756+-0.00356
+Precision: 0.99886+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.89470+-0.00723
+Specificity (TNR, 1-b type 2 error): 0.99901+-0.00003
+Threshold: 1.00309+-0.00022
+
+elapsed_time: 632.7093986819964
+
+2021-01-25 06:35:36.996 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 100
+2021-01-25 06:48:17.968 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99728
+Equal error rate (EER): 0.02254
+
+Accuracy:  0.97770+-0.00144
+Precision: 0.98170+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.97292+-0.00280
+Specificity (TNR, 1-b type 2 error): 0.98235+-0.00022
+Threshold: 1.29293+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99728
+Equal error rate (EER): 0.02254
+
+Accuracy:  0.94179+-0.00324
+Precision: 0.99887+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.88299+-0.00664
+Specificity (TNR, 1-b type 2 error): 0.99902+-0.00005
+Threshold: 0.98425+-0.00029
+
+elapsed_time: 632.9135364471003
+
+2021-01-25 08:27:00.464 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 110
+2021-01-25 08:39:44.326 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99856
+Equal error rate (EER): 0.01482
+
+Accuracy:  0.98573+-0.00103
+Precision: 0.98706+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.98396+-0.00205
+Specificity (TNR, 1-b type 2 error): 0.98744+-0.00010
+Threshold: 1.33333+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99856
+Equal error rate (EER): 0.01482
+
+Accuracy:  0.96833+-0.00270
+Precision: 0.99892+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.93681+-0.00546
+Specificity (TNR, 1-b type 2 error): 0.99901+-0.00004
+Threshold: 1.06211+-0.00025
+
+elapsed_time: 635.4201377339195
+
+2021-01-25 10:18:20.041 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 120
+2021-01-25 10:31:01.090 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99860
+Equal error rate (EER): 0.01482
+
+Accuracy:  0.98593+-0.00107
+Precision: 0.98960+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.98179+-0.00215
+Specificity (TNR, 1-b type 2 error): 0.98996+-0.00010
+Threshold: 1.29293+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99860
+Equal error rate (EER): 0.01482
+
+Accuracy:  0.96979+-0.00251
+Precision: 0.99891+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.93978+-0.00510
+Specificity (TNR, 1-b type 2 error): 0.99900+-0.00004
+Threshold: 1.05147+-0.00027
+
+elapsed_time: 630.6590035730042
+
+2021-01-25 12:09:52.313 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 130
+2021-01-25 12:22:33.331 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99860
+Equal error rate (EER): 0.01465
+
+Accuracy:  0.98604+-0.00119
+Precision: 0.99040+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.98121+-0.00241
+Specificity (TNR, 1-b type 2 error): 0.99074+-0.00006
+Threshold: 1.29293+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99860
+Equal error rate (EER): 0.01465
+
+Accuracy:  0.96991+-0.00296
+Precision: 0.99892+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.94001+-0.00600
+Specificity (TNR, 1-b type 2 error): 0.99901+-0.00004
+Threshold: 1.05941+-0.00026
+
+elapsed_time: 634.0902968740556
+
+2021-01-25 14:05:37.414 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 140
+2021-01-25 14:18:22.354 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99865
+Equal error rate (EER): 0.01451
+
+Accuracy:  0.98630+-0.00078
+Precision: 0.98941+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.98275+-0.00156
+Specificity (TNR, 1-b type 2 error): 0.98976+-0.00010
+Threshold: 1.29293+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99865
+Equal error rate (EER): 0.01451
+
+Accuracy:  0.96997+-0.00293
+Precision: 0.99891+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.94016+-0.00590
+Specificity (TNR, 1-b type 2 error): 0.99900+-0.00004
+Threshold: 1.04753+-0.00033
+
+elapsed_time: 630.9350816409569
+
+2021-01-25 16:56:56.224 | INFO     | facenet.callbacks:on_epoch_end:25 - perform validation for epoch 150
+2021-01-25 17:11:23.021 | INFO     | facenet.statistics:__init__:266 - FaceToFaceValidation
+metric: 0
+
+MaximumAccuracy
+Area under curve (AUC): 0.99863
+Equal error rate (EER): 0.01453
+
+Accuracy:  0.98603+-0.00119
+Precision: 0.98900+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.98262+-0.00239
+Specificity (TNR, 1-b type 2 error): 0.98936+-0.00008
+Threshold: 1.29293+-0.00000
+
+FalseAlarmRate(FAR = 0.001)
+Area under curve (AUC): 0.99863
+Equal error rate (EER): 0.01453
+
+Accuracy:  0.96969+-0.00281
+Precision: 0.99892+-0.00000
+Sensitivity (TPR, 1-a type 1 error): 0.93957+-0.00568
+Specificity (TNR, 1-b type 2 error): 0.99901+-0.00003
+Threshold: 1.04034+-0.00030
+
+elapsed_time: 643.3951193740359
+

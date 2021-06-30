@@ -16,6 +16,6 @@ Ubuntu 20.04
 | 2021-06-30 | Added new model trained with Tensorflow2.4 |
 
 ## Pre-trained models
-| Model name      | Training dataset | Architecture |
-|-----------------|------------------|-------------|
-| [20210124-092137](https://drive.google.com/file/d/1r-B7XeNpPq7PMF7rvi5lTQBhE0-pdtmx/view?usp=sharing) | VGGFace2      | [Inception ResNet v1](https://github.com/RuslanKosarev/FaceNet/blob/master/facenet/models/inception_resnet_v1.py) |
+| Model name      | Results | Training dataset | Architecture |
+|-----------------|---------| -----------------|-------------|
+| [20210124-092137](https://drive.google.com/file/d/1r-B7XeNpPq7PMF7rvi5lTQBhE0-pdtmx/view?usp=sharing) | VGGFace2  | [20210124-092137](https://github.com/RuslanKosarev/FaceNet/blob/master/models/20210124-092137/logs/20210124-092137.log)    | [Inception ResNet v1](https://github.com/RuslanKosarev/FaceNet/blob/master/facenet/models/inception_resnet_v1.py) |

@@ -1,0 +1,10 @@
+----------------------------------------------------------------
+store_revision_info 2021-01-24 09:21:37.766719
+release version: #40~20.04.1-Ubuntu SMP Wed Jan 6 10:15:55 UTC 2021
+python version: 3.8.5 (default, Jul 28 2020, 12:59:40) 
+[GCC 9.3.0]
+tensorflow version: 2.3.1
+arguments: /home/korus/workspace/faces/FaceNet/facenet/apps/train_softmax.py
+git hash: b'1f1edf5dedab3a43c203228701454a6aff59973f'
+git diff: b''
+

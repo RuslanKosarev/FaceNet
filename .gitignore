@@ -8,8 +8,11 @@ __pycache__/
 
 /*.yaml
 /configs/*
-/models/*
 /tmp/*
+*.data*
+*.index
+*.pb
+
 
 # Distribution / packaging
 .Python

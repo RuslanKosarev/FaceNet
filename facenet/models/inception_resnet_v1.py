@@ -87,6 +87,8 @@ class Block35(keras.layers.Layer):
         self.config = check_input_config(config)
         self.mixed_activation = tf.keras.activations.deserialize('relu')
 
+        self.scale = tf.Variable(0, name='Block35/scale', trainable=True, dtype=tf.float32)
+
         self.tower_conv0 = tf.keras.Sequential([
             Conv2D(32, 1, strides=1, padding='same', activation=None, use_bias=False,
                    kernel_initializer=kernel_initializer,
@@ -142,7 +144,7 @@ class Block35(keras.layers.Layer):
                            self.tower_conv1(net),
                            self.tower_conv2(net)], 3)
 
-        net += self.config.scale * self.up(mixed)
+        net += self.scale * self.up(mixed)
 
         if self.mixed_activation:
             net = self.mixed_activation(net)
@@ -156,6 +158,8 @@ class Block17(keras.layers.Layer):
         super().__init__()
         self.config = check_input_config(config)
         self.mixed_activation = tf.keras.activations.deserialize('relu')
+
+        self.scale = tf.Variable(0, name='Block17/scale', trainable=True, dtype=tf.float32)
 
         self.tower_conv0 = tf.keras.Sequential([
             Conv2D(128, 1, strides=1, padding='same', activation=None, use_bias=False,
@@ -196,7 +200,7 @@ class Block17(keras.layers.Layer):
         mixed = tf.concat([self.tower_conv0(net),
                            self.tower_conv1(net)], 3)
 
-        net += self.config.scale * self.up(mixed)
+        net += self.scale * self.up(mixed)
 
         if self.mixed_activation:
             net = self.mixed_activation(net)
@@ -211,6 +215,8 @@ class Block8(keras.layers.Layer):
         super().__init__()
         self.config = check_input_config(config)
         self.mixed_activation = tf.keras.activations.deserialize(self.config.activation)
+
+        self.scale = tf.Variable(0, name='Block8/scale', trainable=True, dtype=tf.float32)
 
         self.tower_conv0 = tf.keras.Sequential([
             Conv2D(192, 1, strides=1, padding='same', activation=None, use_bias=False,
@@ -251,7 +257,7 @@ class Block8(keras.layers.Layer):
         mixed = tf.concat([self.tower_conv0(net),
                            self.tower_conv1(net)], 3)
 
-        net += self.config.scale * self.up(mixed)
+        net += self.scale * self.up(mixed)
 
         if self.mixed_activation:
             net = self.mixed_activation(net)

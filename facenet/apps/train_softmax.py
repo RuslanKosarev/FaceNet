@@ -5,8 +5,6 @@
 # 
 # Copyright (c) 2020 sMedX
 # 
-# https://www.tensorflow.org/tutorials/customization/custom_training_walkthrough
-# https://www.tensorflow.org/guide/keras/customizing_what_happens_in_fit
 
 import click
 from pathlib import Path
@@ -35,9 +33,6 @@ def main(**options):
                                                repeat=True,
                                                buffer_size=10)
 
-    # train_dataset = dataset.pipeline_with_equal_batches(loader,
-    #                                                     train_dbase.classes,
-    #                                                     cfg)
     test_dbase = dataset.Database(cfg.validate.dataset)
     test_dataset = test_dbase.tf_dataset_api(loader,
                                              batch_size=cfg.batch_size,

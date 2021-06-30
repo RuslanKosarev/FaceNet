@@ -1,9 +1,0 @@
-----------------------------------------------------------------
-store_revision_info 2020-05-05 20:08:24.940638
-release version: #46~16.04.1-Ubuntu SMP Fri Dec 7 13:31:08 UTC 2018
-python version: 3.6.9 (default, Mar 24 2020, 16:16:34) 
-[GCC 5.4.0 20160609]
-tensorflow version: 1.13.1
-arguments: /home/ruslan/Faces/FaceNet/facenet/apps/train_softmax.py --config train_softmax.yaml
-git hash: b'1eadc0454f76d72bd1fb8bf355774edbfe4519b9'
-git diff: b''

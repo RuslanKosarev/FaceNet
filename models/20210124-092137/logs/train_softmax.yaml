@@ -1,0 +1,64 @@
+seed: 0
+batch_size: 100
+image: 
+   size: 160
+   margin: 0
+   normalization: 1
+   random_crop: False
+   random_flip: False
+   random_rotate: False
+dataset: 
+   path: /media/a/datasets/vggface2/train_frcnnv3extracted_160
+   h5file: /media/a/datasets/vggface2/train_frcnnv3extracted_160_20190727-080213.h5
+   nrof_classes: None
+   min_nrof_images: None
+   max_nrof_images: None
+   shuffle_buffer_size: 10
+model: 
+   module: facenet.models.inception_resnet_v1
+   checkpoint: None
+   path: /home/korus/models/facenet/softmax/tf2x/20210124-092137
+   config: None
+train: 
+   optimizer: ADAM
+   moving_average_decay: 0.9999
+   log_histograms: False
+   epoch: 
+      nrof_epochs: None
+      size: 1000
+      max_nrof_epochs: 150
+   learning_rate: 
+      value: None
+      schedule: [[50, 0.05], [100, 0.005], [150, 0.0005]]
+   learning_rate_schedule: 
+      value: None
+      schedule: [[100, 0.001], [200, 0.0001], [300, 1e-05]]
+loss: 
+   prelogits_norm_p: 1.0
+   prelogits_hist_max: 10.0
+   prelogits_norm_factor: 0.0
+   center_alfa: 0.95
+   center_factor: 0.0
+validate: 
+   every_n_epochs: 10
+   dataset: 
+      path: /media/a/datasets/megaface/megaface_frcnnv3extracted_160
+      h5file: /media/a/datasets/megaface/megaface_frcnnv3extracted_160_20190727-080213.h5
+      nrof_classes: None
+      min_nrof_images: None
+      max_nrof_images: 50
+   validate: 
+      metric: 0
+      nrof_folds: 10
+      far_target: 0.001
+   split_ratio: 0.05
+   image: 
+      use_flipped_images: False
+      size: 160
+      standardization: 
+   batch_size: 100
+gpu_memory_fraction: 1.0
+logs: 
+   dir: /home/korus/models/facenet/softmax/tf2x/20210124-092137/logs
+   file: 20210124-092137.log
+

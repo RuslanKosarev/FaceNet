@@ -10,6 +10,10 @@ tensorflow = "^2.5.0"
 click = "^8.0.1"
 loguru = "^0.5.3"
 tqdm = "^4.61.2"
+Pillow = "^8.3.0"
+mtcnn = "^0.1.0"
+omegaconf = "^2.1.0"
+scikit-learn = "^0.24.2"
 
 [tool.poetry.dev-dependencies]
 

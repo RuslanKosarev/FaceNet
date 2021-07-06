@@ -6,6 +6,7 @@ seed: 0
 # Number of images to process in a batch.
 batch_size: 100
 
+# Image definition
 image:
   # Image size (height, width) in pixels
   size: 160
@@ -13,3 +14,12 @@ image:
   margin: 0
   # Performs normalization of the input images
   normalization: 0
+
+# Model definition
+model:
+  # Module containing the definition of the inference graph
+  module: facenet.models.inception_resnet_v1
+  # Load a pretrained checkpoint before training starts.
+  checkpoint:
+  # Directory where to write trained models and checkpoints
+  path: ~/models/facenet

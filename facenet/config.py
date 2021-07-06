@@ -27,7 +27,7 @@ default_train_classifier_config = default_config_dir / 'train_classifier.yaml'
 default_train_recognizer_config = default_config_dir / 'train_recognizer.yaml'
 
 
-def subdir():
+def subdir() -> str:
     return datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S')
 
 

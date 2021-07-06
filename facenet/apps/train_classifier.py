@@ -8,6 +8,7 @@
 
 import click
 from pathlib import Path
+from loguru import logger
 
 import tensorflow as tf
 
@@ -19,6 +20,7 @@ from facenet import facenet, config, dataset, logging, callbacks
 @click.option('--config', default=None, type=Path,
               help='Path to yaml config file with used options of the application.')
 def main(**options):
+
     cfg = config.train_classifier(options)
     logging.configure_logging(cfg.logs)
 
@@ -61,7 +63,7 @@ def main(**options):
 
     if cfg.model.checkpoint:
         checkpoint = cfg.model.checkpoint / cfg.model.checkpoint.stem
-        print(f'Restore checkpoint {checkpoint}')
+        logger.info('Restore checkpoint %s', checkpoint)
         network.load_weights(checkpoint)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -98,7 +100,7 @@ def main(**options):
     )
     network.save(cfg.model.path)
 
-    print(f'Model and logs have been saved to the directory: {cfg.model.path}')
+    logger.info('Model and logs have been saved to the directory %s', cfg.model.path)
 
 
 if __name__ == '__main__':

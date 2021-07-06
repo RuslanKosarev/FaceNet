@@ -7,6 +7,9 @@ authors = ["korus <ruslan.kosarev@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 tensorflow = "^2.5.0"
+click = "^8.0.1"
+loguru = "^0.5.3"
+tqdm = "^4.61.2"
 
 [tool.poetry.dev-dependencies]
 

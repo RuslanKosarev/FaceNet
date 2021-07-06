@@ -1,165 +1,107 @@
-"""Train facenet classifier.
+# coding:utf-8
+"""Training a face recognizer with TensorFlow using softmax cross entropy loss
 """
 # MIT License
-#
-# Copyright (c) 2020 SMedX
+# 
+# Copyright (c) 2020 sMedX
+# 
 
 import click
-from tqdm import tqdm
 from pathlib import Path
+from loguru import logger
 
 import tensorflow as tf
-import numpy as np
 
-from facenet import config, facenet, faceclass, ioutils
-
-
-class ConfusionMatrix:
-    def __init__(self, embeddings, classifier):
-        nrof_classes = len(embeddings)
-        nrof_positive_class_pairs = nrof_classes
-        nrof_negative_class_pairs = nrof_classes * (nrof_classes - 1) / 2
-
-        tp = tn = fp = fn = 0
-
-        for i in range(nrof_classes):
-            for k in range(i):
-                outs = classifier.predict(embeddings[i], embeddings[k])
-                mean = np.mean(outs)
-
-                fp += mean
-                tn += 1 - mean
-
-            outs = classifier.predict(embeddings[i])
-            mean = np.mean(outs)
-
-            tp += mean
-            fn += 1 - mean
-
-        tp /= nrof_positive_class_pairs
-        fn /= nrof_positive_class_pairs
-
-        fp /= nrof_negative_class_pairs
-        tn /= nrof_negative_class_pairs
-
-        self.classifier = classifier
-        self.accuracy = (tp + tn) / (tp + fp + tn + fn)
-        self.precision = tp / (tp + fp)
-        self.tp_rate = tp / (tp + fn)
-        self.tn_rate = tn / (tn + fp)
-
-    def __repr__(self):
-        return (f'{self.__class__.__name__}\n' +
-                f'{str(self.classifier)}\n' +
-                f'accuracy  {self.accuracy}\n' +
-                f'precision {self.precision}\n' +
-                f'tp rate   {self.tp_rate}\n' +
-                f'tn rate   {self.tn_rate}\n')
-
-
-def binary_cross_entropy_loss(logits, options):
-    # define upper-triangle indices
-    batch_size = options.nrof_classes_per_batch * options.nrof_examples_per_class
-    triu_indices = [(i, k) for i, k in zip(*np.triu_indices(batch_size, k=1))]
-
-    # compute labels for embeddings
-    labels = []
-    for i, k in triu_indices:
-        if (i // options.nrof_examples_per_class) == (k // options.nrof_examples_per_class):
-            # label 1 means inner class distance
-            labels.append(1)
-        else:
-            # label 0 means across class distance
-            labels.append(0)
-
-    pos_weight = len(labels) / sum(labels) - 1
-
-    logits = tf.gather_nd(logits, triu_indices)
-    labels = tf.constant(labels, dtype=logits.dtype)
-
-    # initialize cross entropy loss
-    cross_entropy = tf.nn.weighted_cross_entropy_with_logits(labels, logits, pos_weight)
-    loss = tf.reduce_mean(cross_entropy)
-
-    return loss
+from facenet.models.inception_resnet_v1 import InceptionResnetV1 as FaceNet
+from facenet import facenet, config, dataset, logging, callbacks
 
 
 @click.command()
 @click.option('--config', default=None, type=Path,
-              help='Path to yaml config file with used options for the application.')
+              help='Path to yaml config file with used options of the application.')
 def main(**options):
-    options = config.train_classifier(__file__, options)
+    cfg = config.train_softmax(options)
+    logging.configure_logging(cfg.logs)
 
-    embeddings = facenet.Embeddings(options.embeddings)
-    ioutils.write_text_log(options.logfile, embeddings)
-    print(embeddings)
+    # ------------------------------------------------------------------------------------------------------------------
+    # define train and test datasets
+    loader = facenet.ImageLoader(config=cfg.image)
 
-    embarray = embeddings.data(normalize=options.embeddings.normalize)
+    train_dbase = dataset.Database(cfg.dataset)
+    train_dataset = train_dbase.tf_dataset_api(loader,
+                                               batch_size=cfg.batch_size,
+                                               repeat=True,
+                                               buffer_size=10)
 
-    next_elem = facenet.equal_batches_input_pipeline(embarray, options)
+    test_dbase = dataset.Database(cfg.validate.dataset)
+    test_dataset = test_dbase.tf_dataset_api(loader,
+                                             batch_size=cfg.batch_size,
+                                             repeat=False,
+                                             buffer_size=None)
 
-    embeddings_batch = tf.placeholder(tf.float32, shape=[None, embeddings.length], name='embeddings_batch')
+    # ------------------------------------------------------------------------------------------------------------------
+    # define network to train
+    model = FaceNet(input_shape=facenet.inputs(cfg.image),
+                    image_processing=facenet.ImageProcessing(cfg.image))
+    model.summary()
 
-    # define classifier
-    if options.embeddings.normalize:
-        model = faceclass.FaceToFaceNormalizedEmbeddingsClassifier()
-    else:
-        model = faceclass.FaceToFaceDistanceClassifier()
+    kernel_regularizer = tf.keras.regularizers.deserialize(model.config.regularizer.kernel.as_dict)
 
-    logits = model(embeddings_batch)
-    cross_entropy = binary_cross_entropy_loss(logits, options)
+    network = tf.keras.Sequential([
+        model,
+        tf.keras.layers.Dense(train_dbase.nrof_classes,
+                              activation=None,
+                              kernel_initializer=tf.keras.initializers.GlorotUniform(),
+                              kernel_regularizer=kernel_regularizer,
+                              bias_initializer='zeros',
+                              bias_regularizer=None,
+                              name='logits')
+    ])
 
-    # define train operations
-    global_step = tf.Variable(0, trainable=False, name='global_step')
+    network(facenet.inputs(cfg.image))
 
-    dtype = tf.float64
-    initial_learning_rate = tf.constant(options.train.learning_rate_schedule.initial_value, dtype=dtype)
-    decay_rate = tf.constant(options.train.learning_rate_schedule.decay_rate, dtype=dtype)
+    if cfg.model.checkpoint:
+        checkpoint = cfg.model.checkpoint / cfg.model.checkpoint.stem
+        print(f'Restore checkpoint {checkpoint}')
+        network.load_weights(checkpoint)
 
-    if not options.train.learning_rate_schedule.decay_steps:
-        decay_steps = tf.constant(options.train.epoch.size, dtype=dtype)
-    else:
-        decay_steps = tf.constant(options.train.learning_rate_schedule.decay_steps, dtype=dtype)
+    # ------------------------------------------------------------------------------------------------------------------
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=cfg.model.path / cfg.model.path.stem,
+        save_weights_only=True,
+        verbose=True
+    )
 
-    lr_decay_factor = tf.math.pow(decay_rate, tf.math.floor(tf.cast(global_step, dtype=dtype) / decay_steps))
-    learning_rate = initial_learning_rate * lr_decay_factor
+    learning_rate_callback = tf.keras.callbacks.LearningRateScheduler(
+        facenet.LearningRateScheduler(config=cfg.train.learning_rate),
+        verbose=True
+    )
 
-    train_ops = facenet.train_op(options.train, cross_entropy, global_step, learning_rate, tf.global_variables())
+    validate_callbacks = callbacks.ValidateCallback(model, test_dataset,
+                                                    every_n_epochs=cfg.validate.every_n_epochs,
+                                                    max_nrof_epochs=cfg.train.epoch.max_nrof_epochs,
+                                                    config=cfg.validate)
 
-    tensor_ops = {
-        'global_step': global_step,
-        'loss': cross_entropy,
-        'vars': tf.trainable_variables(),
-        'learning_rate': learning_rate
-    }
+    network.compile(
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        optimizer=tf.keras.optimizers.Adam(epsilon=0.1)
+    )
 
-    print('start training')
+    network.fit(
+        train_dataset,
+        epochs=cfg.train.epoch.max_nrof_epochs,
+        steps_per_epoch=cfg.train.epoch.size,
+        callbacks=[
+            checkpoint_callback,
+            learning_rate_callback,
+            validate_callbacks,
+        ]
+    )
+    network.save(cfg.model.path)
 
-    with tf.Session() as session:
-        session.run([tf.global_variables_initializer(), tf.local_variables_initializer()])
-
-        for epoch in range(options.train.epoch.max_nrof_epochs):
-            with tqdm(total=options.train.epoch.size) as bar:
-                for _ in range(options.train.epoch.size):
-                    embeddings_batch_np = session.run(next_elem)
-                    feed_dict = {embeddings_batch: embeddings_batch_np}
-
-                    _, outs = session.run([train_ops, tensor_ops], feed_dict=feed_dict)
-
-                    postfix = f"variables {outs['vars']}, loss {outs['loss']}"
-                    bar.set_postfix_str(postfix)
-                    bar.update()
-
-            info = f"epoch [{epoch + 1}/{options.train.epoch.max_nrof_epochs}], learning rate {outs['learning_rate']}"
-            print(info)
-
-            conf_mat = ConfusionMatrix(embarray, model)
-            print(conf_mat)
-            ioutils.write_text_log(options.logfile, info)
-            ioutils.write_text_log(options.logfile, conf_mat)
-
-    print(f'Model has been saved to the directory: {options.classifier.path}')
+    print(f'Model and logs have been saved to the directory: {cfg.model.path}')
 
 
 if __name__ == '__main__':
     main()
+

@@ -53,13 +53,15 @@ def main(**options):
 
     network = tf.keras.Sequential([
         model,
-        tf.keras.layers.Dense(train_dataset.nrof_classes,
-                              activation=None,
-                              kernel_initializer=tf.keras.initializers.GlorotUniform(),
-                              kernel_regularizer=kernel_regularizer,
-                              bias_initializer='zeros',
-                              bias_regularizer=None,
-                              name='logits')
+        tf.keras.layers.Dense(
+            train_dataset.nrof_classes,
+            activation=None,
+            kernel_initializer=tf.keras.initializers.GlorotUniform(),
+            kernel_regularizer=kernel_regularizer,
+            bias_initializer='zeros',
+            bias_regularizer=None,
+            name='logits'
+        )
     ])
 
     network(facenet.inputs(cfg.image))
@@ -81,11 +83,13 @@ def main(**options):
         verbose=True
     )
 
-    validate_callbacks = callbacks.ValidateCallback(model,
-                                                    tf_test_dataset,
-                                                    every_n_epochs=cfg.validate.every_n_epochs,
-                                                    max_nrof_epochs=cfg.train.epoch.max_nrof_epochs,
-                                                    config=cfg.validate)
+    validate_callbacks = callbacks.ValidateCallback(
+        model,
+        tf_test_dataset,
+        every_n_epochs=cfg.validate.every_n_epochs,
+        max_nrof_epochs=cfg.train.epoch.max_nrof_epochs,
+        config=cfg.validate
+    )
 
     network.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),

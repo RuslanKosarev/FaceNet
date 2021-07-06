@@ -41,64 +41,6 @@ def tf_dataset_api(files, labels, loader, batch_size, buffer_size=None, repeat=F
     return ds
 
 
-def pipeline_with_equal_batches(loader, classes, config):
-    """
-    Building input pipeline with random equal batches.
-
-    :param classes:
-    :param config:
-    :return: 
-    """
-    # if not config.nrof_classes_per_batch:
-    #     config.nrof_classes_per_batch = len(embeddings)
-    #
-    # if not config.nrof_examples_per_class:
-    #     config.nrof_examples_per_class = round(0.1*sum([len(embs) for embs in embeddings]) / len(embeddings))
-    #     config.nrof_examples_per_class = max(config.nrof_examples_per_class, 1)
-
-    config.nrof_classes_per_batch = 20
-    config.nrof_examples_per_class = 5
-
-    for idx, _class in enumerate(classes):
-        _class.index = idx
-
-    print('building pipeline with random equal batches.')
-    print('number of classes per batch ', config.nrof_classes_per_batch)
-    print('number of examples per class', config.nrof_examples_per_class)
-
-    def generator():
-        while True:
-            _classes = []
-            _indexes = []
-
-            for cls in random.sample(classes, config.nrof_classes_per_batch):
-                _classes += random.sample(cls.files, config.nrof_examples_per_class)
-                _indexes += [cls.index] * config.nrof_examples_per_class
-            yield _classes, _indexes
-
-    ds = tf.data.Dataset.from_generator(generator, output_types=(tf.string, tf.int32))
-
-    files = ds.map(lambda xi, yi: xi)
-    files = files.flat_map(lambda xi: tf.data.Dataset.from_tensor_slices(xi))
-    images = files.map(loader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
-    labels = ds.map(lambda xi, yi: yi)
-    labels = labels.flat_map(lambda yi: tf.data.Dataset.from_tensor_slices(yi))
-
-    ds = tf.data.Dataset.zip((images, labels))
-
-    batch_size = config.nrof_classes_per_batch * config.nrof_examples_per_class
-    ds = ds.batch(batch_size)
-
-    info = (f'{ds}\n' +
-            f'batch size: {batch_size}\n' +
-            f'cardinality: {ds.cardinality()}')
-
-    logger.info('\n' + info)
-
-    return ds
-
-
 class ImageClass:
     """
     Stores the paths to images for a given class

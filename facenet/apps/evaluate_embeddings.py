@@ -21,16 +21,22 @@ def main(**cfg):
     cfg = config.evaluate_embeddings(cfg)
     logging.configure_logging(cfg.logs)
 
+    loader = facenet.ImageLoader(config=cfg.image)
     dataset = Database(cfg.dataset)
+    tf_dataset = dataset.tf_dataset_api(loader,
+                                        batch_size=cfg.batch_size,
+                                        repeat=False,
+                                        buffer_size=None)
 
-    ioutils.write_text_log(cfg.logfile, dataset)
-    embeddings = facenet.EvaluationOfEmbeddings(dataset, cfg)
+    model = tf.keras.models.load_model(cfg.model.path, custom_objects=None, compile=True, options=None)
 
-    h5utils.write(cfg.outfile, 'embeddings', embeddings.embeddings)
-    h5utils.write(cfg.outfile, 'labels', embeddings.labels)
+    embeddings, labels = facenet.evaluate_embeddings(model, tf_dataset)
 
-    logger.info('Output file:', cfg.outfile)
-    logger.info('Number of examples:', dataset.nrof_images)
+    h5utils.write(cfg.outfile, 'embeddings', embeddings)
+    h5utils.write(cfg.outfile, 'labels', labels)
+
+    logger.info('Output h5 file: %s', cfg.outfile)
+    logger.info('Number of examples: %s', dataset.nrof_images)
 
 
 if __name__ == '__main__':

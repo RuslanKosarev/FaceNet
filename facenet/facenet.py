@@ -123,76 +123,18 @@ def equal_batches_input_pipeline(embeddings, config):
     return next_elem
 
 
-# def dataset(files, labels, loader, batch_size, repeat=False, buffer_size=None):
-#     """
-#
-#     :param files:
-#     :param labels:
-#     :param loader:
-#     :param batch_size:
-#     :param repeat:
-#     :param buffer_size:
-#     :return:
-#     """
-#
-#     data = list(zip(files, labels))
-#     np.random.shuffle(data)
-#     files, labels = map(list, zip(*data))
-#
-#     images = tf.data.Dataset.from_tensor_slices(files).map(loader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-#     labels = tf.data.Dataset.from_tensor_slices(labels)
-#
-#     ds = tf.data.Dataset.zip((images, labels))
-#
-#     if buffer_size is not None:
-#         buffer_size *= batch_size
-#         ds = ds.shuffle(buffer_size=buffer_size, reshuffle_each_iteration=True)
-#
-#     if repeat:
-#         ds = ds.repeat()
-#
-#     ds = ds.batch(batch_size=batch_size)
-#     ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
-#
-#     info = (f'{ds}\n' +
-#             f'batch size: {batch_size}\n' +
-#             f'buffer size: {buffer_size}\n' +
-#             f'repeat: {repeat}\n' +
-#             f'cardinality: {ds.cardinality()}')
-#
-#     logger.info('\n' + info)
-#
-#     return ds
-
-
-# def make_test_dataset(dbase, loader, config):
-#     files, labels = dbase.files, dbase.labels
-#
-#     images = tf.data.Dataset.from_tensor_slices(files).map(loader)
-#     labels = tf.data.Dataset.from_tensor_slices(labels)
-#     ds = tf.data.Dataset.zip((images, labels))
-#
-#     ds = ds.batch(batch_size=config.batch_size)
-#     ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
-#
-#     logger.info(f'batch_size: {config.batch_size}')
-#     logger.info(f'cardinality: {ds.cardinality()}')
-#
-#     return ds
-
-
-def evaluate_embeddings(model, dset):
+def evaluate_embeddings(model, tf_dataset):
     """
     Evaluate embeddings for given data set
     :param model:
-    :param dset:
+    :param tf_dataset:
     :return:
     """
 
     embeddings_ = []
     labels_ = []
 
-    for images, labels in tqdm(dset):
+    for images, labels in tqdm(tf_dataset):
         embeddings = model(images)
 
         embeddings_.append(embeddings)
@@ -294,88 +236,6 @@ class Embeddings:
                 embeddings[idx] /= np.linalg.norm(self.embeddings[idx], axis=1, keepdims=True)
 
         return embeddings
-
-
-# class EvaluationOfEmbeddings:
-#     def __init__(self, dbase, config):
-#         self.config = config
-#         self.dbase = dbase
-#         self.embeddings = []
-#         self.labels = []
-#
-#         facenet = FaceNet(self.config.model)
-#
-#         print('Running forward pass on images')
-#         loader = ImageLoader(config=config.image)
-#         dataset = make_test_dataset(dbase, loader, self.config)
-#         iterator = dataset.make_one_shot_iterator().get_next()
-#
-#         with tf.Session() as sess:
-#             nrof_batches = sess.run(tf.data.experimental.cardinality(dataset))
-#
-#             for _ in tqdm(range(nrof_batches)):
-#                 image_batch, label_batch = sess.run(iterator)
-#
-#                 embeddings = facenet.evaluate(image_batch)
-#
-#                 self.embeddings.append(embeddings)
-#                 self.labels.append(label_batch)
-#
-#         self.embeddings = np.concatenate(self.embeddings)
-#         self.labels = np.concatenate(self.labels)
-#
-#     def __repr__(self):
-#         return ('{}\n'.format(self.__class__.__name__) +
-#                 'model: {}\n'.format(self.config.model) +
-#                 'embedding size: {}\n'.format(self.embeddings.shape))
-#
-#     def split(self):
-#         list_of_embeddings = []
-#
-#         for label in np.unique(self.labels):
-#             emb_array = self.embeddings[label == self.labels]
-#             list_of_embeddings.append(emb_array)
-#         return list_of_embeddings
-
-
-# class ConstantLearningRate(tf.keras.optimizers.schedules.LearningRateSchedule):
-#     """
-#         Learning rate schedule that return constant value
-#     """
-#     def __init__(self, value, name=None):
-#         super().__init__()
-#         self.value = tf.convert_to_tensor(value, dtype=tf.float32)
-#         self.name = name
-#
-#     def __call__(self, step):
-#         return self.value
-#
-#     def get_config(self):
-#         return self.__dict__
-
-
-# class PiecewiseConstantLearningRate(tf.keras.optimizers.schedules.LearningRateSchedule):
-#     """
-#         Learning rate schedule for piecewise-constant learning rate
-#     """
-#     def __init__(self, epochs, size, values, name=None):
-#         super().__init__()
-#         self.boundaries = [epoch*size for epoch in epochs]
-#         self.size = size
-#         self.values = values
-#         self.name = name
-#
-#     def __call__(self, step):
-#         value = self.values[-1]
-#
-#         for boundary, value in zip(self.boundaries, self.values):
-#             if step < boundary:
-#                 break
-#
-#         return tf.convert_to_tensor(value, dtype=tf.float32)
-#
-#     def get_config(self):
-#         return self.__dict__
 
 
 class LearningRateScheduler:

@@ -1,8 +1,5 @@
 # coding:utf-8
 
-# type of the output file (h5 or tfrecord)
-suffix: .h5
-
 dataset:
   # Path to the directory with aligned face images to train facenet.
   path: ~/datasets/vggface2/test_extracted_160

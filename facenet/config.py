@@ -25,6 +25,7 @@ default_model_path = Path(__file__).parents[1] / 'models/default'
 user_config = user_config_dir / 'config.yaml'
 default_train_classifier_config = default_config_dir / 'train_classifier.yaml'
 default_train_recognizer_config = default_config_dir / 'train_recognizer.yaml'
+default_evaluate_embeddings_config = default_config_dir / 'evaluate_embeddings.yaml'
 
 
 def subdir() -> str:
@@ -147,6 +148,9 @@ def load_config(app_file_name, options):
 def train_classifier(options):
     cfg = load_config(default_train_classifier_config, options)
 
+    # set seed for random number generators
+    set_seed(cfg.seed)
+
     path = Path(cfg.model.path).expanduser()
     cfg.model.path = path / subdir()
 
@@ -165,9 +169,6 @@ def train_classifier(options):
         cfg.validate.image.size = cfg.image.size
         cfg.validate.image.standardization = cfg.image.standardization
 
-    # set seed for random number generators
-    set_seed(cfg.seed)
-
     # write arguments and store some git revision info in a text files in the log directory
     ioutils.write_arguments(cfg, cfg.logs.dir)
     ioutils.store_revision_info(cfg.logs.dir)
@@ -178,13 +179,13 @@ def train_classifier(options):
 def train_recognizer(options):
     cfg = load_config(default_train_recognizer_config, options)
 
+    # set seed for random number generators
+    set_seed(cfg.seed)
+
     cfg.classifier.path = Path(cfg.classifier.path).expanduser() / subdir()
 
     cfg.logdir = cfg.classifier.path
     cfg.logfile = cfg.logdir / 'log.txt'
-
-    # set seed for random number generators
-    set_seed(cfg.seed)
 
     # write arguments and store some git revision info in a text files in the log directory
     ioutils.write_arguments(cfg, cfg.logdir.joinpath(Path(app_file_name).stem + '.yaml'))
@@ -193,28 +194,26 @@ def train_recognizer(options):
     return cfg
 
 
-def evaluate_embeddings(app_file_name, options):
-    cfg = load_config(app_file_name, options)
-
-    if not cfg.model.path:
-        cfg.model.path = default_model_path
-
-    if cfg.suffix not in ('.h5', '.tfrecord'):
-        raise ValueError('Invalid suffix for output file, must either be h5 or tfrecord.')
-
-    cfg.outdir = Path(cfg.dataset.path + '_' + Path(cfg.model.path).stem)
-    cfg.outdir = Path(cfg.outdir).expanduser()
-
-    cfg.logdir = cfg.outdir
-    cfg.logfile = cfg.outdir.joinpath('log.txt')
-    cfg.outfile = cfg.outdir.joinpath('embeddings').with_suffix(cfg.suffix)
+def evaluate_embeddings(options):
+    cfg = load_config(default_evaluate_embeddings_config, options)
 
     # set seed for random number generators
     set_seed(cfg.seed)
 
+    if not cfg.model.path:
+        cfg.model.path = default_model_path
+
+    cfg.outdir = Path(cfg.dataset.path + '_' + Path(cfg.model.path).stem)
+    cfg.outdir = Path(cfg.outdir).expanduser()
+    cfg.outfile = cfg.outdir / 'embeddings.h5'
+
+    cfg.logs = Config()
+    cfg.logs.dir = cfg.outdir
+    cfg.logs.file = cfg.outdir / 'log.txt'
+
     # write arguments and store some git revision info in a text files in the log directory
-    ioutils.write_arguments(cfg, cfg.logdir.joinpath(Path(app_file_name).stem + '.yaml'))
-    ioutils.store_revision_info(cfg.logdir)
+    ioutils.write_arguments(cfg, cfg.logs.dir)
+    ioutils.store_revision_info(cfg.logs.dir)
 
     return cfg
 

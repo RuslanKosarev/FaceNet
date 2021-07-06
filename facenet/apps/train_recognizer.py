@@ -7,11 +7,12 @@
 import click
 from tqdm import tqdm
 from pathlib import Path
+from loguru import logger
 
 import tensorflow as tf
 import numpy as np
 
-from facenet import config, facenet, faceclass, ioutils
+from facenet import config, facenet, faceclass, ioutils, logging
 
 
 class ConfusionMatrix:
@@ -88,7 +89,8 @@ def binary_cross_entropy_loss(logits, options):
 @click.option('--config', default=None, type=Path,
               help='Path to yaml config file with used options for the application.')
 def main(**options):
-    options = config.train_classifier(__file__, options)
+    options = config.train_classifier(options)
+    logging.configure_logging(options.logs)
 
     embeddings = facenet.Embeddings(options.embeddings)
     ioutils.write_text_log(options.logfile, embeddings)

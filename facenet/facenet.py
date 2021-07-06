@@ -131,16 +131,14 @@ def evaluate_embeddings(model, tf_dataset):
     :return:
     """
 
-    embeddings_ = []
-    labels_ = []
+    embeddings = []
+    labels = []
 
-    for images, labels in tqdm(tf_dataset):
-        embeddings = model(images)
+    for image_batch, label_batch in tqdm(tf_dataset):
+        embeddings.append(model(image_batch))
+        labels.append(label_batch)
 
-        embeddings_.append(embeddings)
-        labels_.append(labels)
-
-    return np.concatenate(embeddings_), np.concatenate(labels_)
+    return np.concatenate(embeddings), np.concatenate(labels)
 
 
 def center_loss(features, label, alfa, nrof_classes):

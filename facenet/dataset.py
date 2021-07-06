@@ -7,7 +7,6 @@ from loguru import logger
 
 import tensorflow as tf
 import numpy as np
-import random
 
 
 def tf_dataset_api(files, labels, loader, batch_size, buffer_size=None, repeat=False):

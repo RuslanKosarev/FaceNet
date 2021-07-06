@@ -1,7 +1,6 @@
 # coding: utf-8
 __author__ = 'Ruslan N. Kosarev'
 
-import sys
 from pathlib import Path
 from datetime import datetime
 
@@ -15,14 +14,17 @@ from facenet import ioutils
 
 # directory for default configs
 default_config_dir = Path(__file__).parents[0].joinpath('apps', 'configs')
-default_config = default_config_dir.joinpath('config.yaml')
+default_config = default_config_dir / 'config.yaml'
 
 # directory for user's configs
-user_config_dir = Path(__file__).parents[1].joinpath('configs')
-user_config = user_config_dir.joinpath('config.yaml')
+user_config_dir = Path(__file__).parents[1] / 'configs'
 
 # directory for default trained model
-default_model_path = Path(__file__).parents[1].joinpath('models/default')
+default_model_path = Path(__file__).parents[1] / 'models/default'
+
+user_config = user_config_dir / 'config.yaml'
+default_train_classifier_config = default_config_dir / 'train_classifier.yaml'
+default_train_recognizer_config = default_config_dir / 'train_recognizer.yaml'
 
 
 def subdir():
@@ -142,33 +144,10 @@ def load_config(app_file_name, options):
     return cfg
 
 
-def extract_faces(app_file_name, options):
-    cfg = load_config(app_file_name, options)
-
-    if not cfg.outdir:
-        cfg.outdir = f'{Path(cfg.dataset.path)}_extracted_{cfg.image.size}'
-
-    cfg.outdir = Path(cfg.outdir).expanduser()
-    cfg.logdir = cfg.outdir
-    cfg.logfile = cfg.outdir / 'log.txt'
-    cfg.h5file = cfg.outdir / 'statistics.h5'
-
-    # set seed for random number generators
-    set_seed(cfg.seed)
-
-    # write arguments and store some git revision info in a text files in the log directory
-    ioutils.write_arguments(cfg, cfg.logdir.joinpath(Path(app_file_name).stem + '.yaml'))
-    ioutils.store_revision_info(cfg.logdir)
-
-    return cfg
-
-
-def train_softmax(options):
-    app_file_name = sys.argv[0]
-    cfg = load_config(app_file_name, options)
+def train_classifier(options):
+    cfg = load_config(default_train_classifier_config, options)
 
     path = Path(cfg.model.path).expanduser()
-
     cfg.model.path = path / subdir()
 
     cfg.logs = Config()
@@ -196,7 +175,25 @@ def train_softmax(options):
     return cfg
 
 
-def embeddings(app_file_name, options):
+def train_recognizer(options):
+    cfg = load_config(default_train_recognizer_config, options)
+
+    cfg.classifier.path = Path(cfg.classifier.path).expanduser() / subdir()
+
+    cfg.logdir = cfg.classifier.path
+    cfg.logfile = cfg.logdir / 'log.txt'
+
+    # set seed for random number generators
+    set_seed(cfg.seed)
+
+    # write arguments and store some git revision info in a text files in the log directory
+    ioutils.write_arguments(cfg, cfg.logdir.joinpath(Path(app_file_name).stem + '.yaml'))
+    ioutils.store_revision_info(cfg.logdir)
+
+    return cfg
+
+
+def evaluate_embeddings(app_file_name, options):
     cfg = load_config(app_file_name, options)
 
     if not cfg.model.path:
@@ -211,46 +208,6 @@ def embeddings(app_file_name, options):
     cfg.logdir = cfg.outdir
     cfg.logfile = cfg.outdir.joinpath('log.txt')
     cfg.outfile = cfg.outdir.joinpath('embeddings').with_suffix(cfg.suffix)
-
-    # set seed for random number generators
-    set_seed(cfg.seed)
-
-    # write arguments and store some git revision info in a text files in the log directory
-    ioutils.write_arguments(cfg, cfg.logdir.joinpath(Path(app_file_name).stem + '.yaml'))
-    ioutils.store_revision_info(cfg.logdir)
-
-    return cfg
-
-
-def validate(app_file_name, options):
-    cfg = load_config(app_file_name, options)
-
-    if not cfg.model.path:
-        cfg.model.path = default_model_path
-
-    cfg.outdir = Path(cfg.dataset.path + '_' + Path(cfg.model.path).stem)
-    cfg.outdir = Path(cfg.outdir).expanduser()
-
-    cfg.logdir = cfg.outdir
-    cfg.logfile = cfg.outdir.joinpath('validate.txt')
-
-    # set seed for random number generators
-    set_seed(cfg.seed)
-
-    # write arguments and store some git revision info in a text files in the log directory
-    ioutils.write_arguments(cfg, cfg.logdir.joinpath(Path(app_file_name).stem + '.yaml'))
-    ioutils.store_revision_info(cfg.logdir)
-
-    return cfg
-
-
-def train_classifier(app_file_name, options):
-    cfg = load_config(app_file_name, options)
-
-    cfg.classifier.path = Path(cfg.classifier.path).expanduser() / subdir()
-
-    cfg.logdir = cfg.classifier.path
-    cfg.logfile = cfg.logdir / 'log.txt'
 
     # set seed for random number generators
     set_seed(cfg.seed)

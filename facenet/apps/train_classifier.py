@@ -8,7 +8,6 @@
 
 import click
 from pathlib import Path
-from loguru import logger
 
 import tensorflow as tf
 
@@ -20,7 +19,7 @@ from facenet import facenet, config, dataset, logging, callbacks
 @click.option('--config', default=None, type=Path,
               help='Path to yaml config file with used options of the application.')
 def main(**options):
-    cfg = config.train_softmax(options)
+    cfg = config.train_classifier(options)
     logging.configure_logging(cfg.logs)
 
     # ------------------------------------------------------------------------------------------------------------------

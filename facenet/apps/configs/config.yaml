@@ -23,3 +23,26 @@ model:
   checkpoint:
   # Directory where to write trained models and checkpoints
   path: ~/models/facenet
+
+train:
+  dataset:
+    # Path to the directory with aligned face images to train facenet.
+    path: ~/datasets/vggface2/train_extracted_160
+    # Number of classes to download from data set
+    nrof_classes:
+    # Minimal number of images per class to download from class
+    min_nrof_images:
+    # Maximal number of images per class to download from class
+    max_nrof_images:
+
+test:
+  dataset:
+    # Path to the directory with aligned face images to train facenet.
+    path: ~/datasets/megaface/megaface_frcnnv3extracted_160
+    # Number of classes to download from data set
+    nrof_classes:
+    # Minimal number of images per class to download from class
+    min_nrof_images:
+    # Maximal number of images per class to download from class
+    max_nrof_images:
+

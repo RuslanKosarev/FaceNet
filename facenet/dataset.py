@@ -9,8 +9,6 @@ import tensorflow as tf
 import numpy as np
 import random
 
-from facenet import h5utils
-
 
 def tf_dataset_api(files, labels, loader, batch_size, buffer_size=None, repeat=False):
 
@@ -119,10 +117,6 @@ class ImageClass:
 
         files = list(self.path.glob('*'))
 
-        if config.h5file:
-            h5file = Path(config.h5file).expanduser()
-            files = [f for f in files if h5utils.read(h5file, h5utils.filename2key(f, 'is_valid'), default=True)]
-
         if config.max_nrof_images:
             if len(files) > config.max_nrof_images:
                 files = np.random.choice(files, size=config.max_nrof_images, replace=False)
@@ -153,10 +147,6 @@ class Database:
             raise ValueError(f'Directory {self.path} does not exist')
         print('Download data set from {}'.format(self.path))
 
-        self.h5file = config.h5file
-        if self.h5file:
-            self.h5file = Path(self.h5file).expanduser()
-
         dirs = [p for p in self.path.glob('*') if p.is_dir()]
         if config.nrof_classes:
             if len(dirs) > config.nrof_classes:
@@ -182,7 +172,6 @@ class Database:
         """Representation of the database"""
         return (f'{self.__class__.__name__}\n' +
                 f'{self.path}\n' +
-                f'h5 file {self.h5file}\n' +
                 f'Number of classes {self.nrof_classes} \n' +
                 f'Number of images {self.nrof_images}\n' +
                 f'Minimal number of images in class {self.min_nrof_images}\n' +

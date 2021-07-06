@@ -78,40 +78,12 @@ class MTCNN:
         return bboxes
 
 
-class FasterRCNNv3:
-    def __init__(self, gpu_memory_fraction=1.0):
-        from .frcnnv3 import detector
-        self.__detector = detector.FaceDetector(gpu_memory_fraction=gpu_memory_fraction).get_faces
-        self.mode = 'RGB'
-
-    def detector(self, image):
-
-        boxes, scores = self.__detector(image)
-        bboxes = []
-
-        for (y1, x1, y2, x2), score in zip(boxes, scores):
-            bbox = BoundingBox(left=x1, top=y1, width=x2-x1, height=y2-y1, confidence=score)
-            bboxes.append(bbox)
-
-        return bboxes
-
-
 class FaceDetector:
-    def __init__(self, detector='frcnnv3', gpu_memory_fraction=1.0):
-        self.detector = detector
+    def __init__(self):
 
-        if self.detector == 'pypimtcnn':
-            obj = MTCNN()
-            self.mode = obj.mode
-            self.__detector = obj.detector
-
-        elif self.detector == 'frcnnv3':
-            obj = FasterRCNNv3(gpu_memory_fraction=gpu_memory_fraction)
-            self.mode = obj.mode
-            self.__detector = obj.detector
-
-        else:
-            raise 'Undefined face detector type {}'.format(self.detector)
+        obj = MTCNN()
+        self.mode = obj.mode
+        self.__detector = obj.detector
 
     def detect(self, image):
         return self.__detector(image)

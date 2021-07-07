@@ -17,7 +17,7 @@ dataset:
 model: 
    module: facenet.models.inception_resnet_v1
    checkpoint: None
-   path: /home/korus/models/facenet/softmax/tf2x/default
+   path: /home/korus/models/facenet/softmax/tf2x/20210124-092137
    config: None
 train: 
    optimizer: ADAM
@@ -59,6 +59,6 @@ validate:
    batch_size: 100
 gpu_memory_fraction: 1.0
 logs: 
-   dir: /home/korus/models/facenet/softmax/tf2x/default/logs
-   file: default.log
+   dir: /home/korus/models/facenet/softmax/tf2x/20210124-092137/logs
+   file: 20210124-092137.log
 

@@ -23,10 +23,10 @@ def main(**cfg):
 
     loader = facenet.ImageLoader(config=cfg.image)
     dataset = Database(cfg.dataset)
-    tf_dataset = dataset.tf_dataset_api(loader,
-                                        batch_size=cfg.batch_size,
-                                        repeat=False,
-                                        buffer_size=None)
+    tf_dataset = dataset.tf_dataset_api(
+        loader,
+        batch_size=cfg.batch_size
+    )
 
     model = tf.keras.models.load_model(cfg.model.path, custom_objects=None, compile=True, options=None)
 

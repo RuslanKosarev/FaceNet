@@ -27,6 +27,7 @@ def main(**cfg):
     )
 
     model = tf.keras.models.load_model(cfg.model.path, custom_objects=None, compile=True, options=None)
+    model = model.get_layer('inception_resnet_v1')
 
     embeddings, labels = facenet.evaluate_embeddings(model, tf_dataset)
 

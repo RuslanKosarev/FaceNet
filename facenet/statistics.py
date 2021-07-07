@@ -16,7 +16,7 @@ from scipy import interpolate
 from scipy.optimize import brentq
 from pathlib import Path
 
-from facenet import utils, ioutils, h5utils
+from facenet import ioutils, h5utils
 
 
 def pairwise_similarities(xa, xb=None, metric=0, atol=1.e-5):

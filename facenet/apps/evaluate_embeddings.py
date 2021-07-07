@@ -34,7 +34,7 @@ def main(**cfg):
     h5utils.write(cfg.h5file, 'embeddings', embeddings)
     h5utils.write(cfg.h5file, 'labels', labels)
 
-    logger.info('Output h5 file: {file}', file=cfg.outfile)
+    logger.info('Output h5 file: {file}', file=cfg.h5file)
     logger.info('Number of examples: {count}', count=dataset.nrof_images)
 
 

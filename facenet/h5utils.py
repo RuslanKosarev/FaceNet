@@ -11,7 +11,9 @@ def write(file: Union[Path, str], path: str, data, mode='a'):
     file = Path(file).expanduser()
 
     with h5py.File(file, mode=mode) as hf:
-        hf[path][...] = data
+        if path in hf:
+            del hf[path]
+        hf[path] = data
 
 
 def read(file: Union[Path, str], path: str, **kwargs):
@@ -25,4 +27,4 @@ def read(file: Union[Path, str], path: str, **kwargs):
         if 'default' in kwargs.keys():
             return kwargs['default']
         else:
-            raise KeyError(f'Invalid path {path} in H5 file {file}')
+            raise KeyError(f'Invalid path {path} in h5 file {file}')

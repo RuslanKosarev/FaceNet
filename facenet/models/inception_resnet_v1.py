@@ -485,7 +485,7 @@ class InceptionResnetV1(keras.Model):
             self.features
         )
 
-        self(input_shape)
+        self(input_shape)   # noqa
 
     def call(self, inputs, training=False, **kwargs):
         # evaluate output of model

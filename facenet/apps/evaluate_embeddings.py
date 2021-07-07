@@ -15,7 +15,7 @@ from facenet.dataset import Database
 
 @click.command()
 @click.option('--config', default=None, type=Path,
-              help='Path to yaml config file with used options for the application.')
+              help='Path to yaml config file with options for the application.')
 def main(**cfg):
     cfg = config.evaluate_embeddings(cfg)
 

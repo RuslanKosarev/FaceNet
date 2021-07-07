@@ -13,7 +13,7 @@ from loguru import logger
 import tensorflow as tf
 
 from facenet.models.inception_resnet_v1 import InceptionResnetV1 as FaceNet
-from facenet import facenet, config, logging, callbacks
+from facenet import facenet, config, callbacks
 from facenet.dataset import Database
 
 
@@ -23,7 +23,6 @@ from facenet.dataset import Database
 def main(**options):
 
     cfg = config.train_classifier(options)
-    logging.configure_logging(cfg.logs)
 
     # ------------------------------------------------------------------------------------------------------------------
     # define train and test datasets

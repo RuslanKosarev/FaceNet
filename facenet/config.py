@@ -172,6 +172,8 @@ def train_classifier(options):
     ioutils.write_arguments(cfg, cfg.logs.dir)
     ioutils.store_revision_info(cfg.logs.dir)
 
+    logging.configure_logging(cfg.logs)
+
     return cfg
 
 

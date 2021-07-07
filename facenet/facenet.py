@@ -1,25 +1,7 @@
 """Functions for building the face recognition network.
 """
-# MIT License
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 
+from typing import List
 from tqdm import tqdm
 from loguru import logger
 from pathlib import Path
@@ -27,7 +9,6 @@ from pathlib import Path
 import random
 import numpy as np
 import tensorflow as tf
-
 
 from facenet import nodes, h5utils, FaceNet
 
@@ -94,16 +75,16 @@ def equal_batches_input_pipeline(embeddings, config):
     :param config: 
     :return: 
     """""
-    if not config.nrof_classes_per_batch:
-        config.nrof_classes_per_batch = len(embeddings)
+    # if not config.nrof_classes_per_batch:
+    #     config.nrof_classes_per_batch = len(embeddings)
+    #
+    # if not config.nrof_examples_per_class:
+    #     config.nrof_examples_per_class = round(0.1*sum([len(embs) for embs in embeddings]) / len(embeddings))
+    #     config.nrof_examples_per_class = max(config.nrof_examples_per_class, 1)
 
-    if not config.nrof_examples_per_class:
-        config.nrof_examples_per_class = round(0.1*sum([len(embs) for embs in embeddings]) / len(embeddings))
-        config.nrof_examples_per_class = max(config.nrof_examples_per_class, 1)
-
-    print('building equal batches input pipeline.')
-    print('number of classes per batch ', config.nrof_classes_per_batch)
-    print('number of examples per class', config.nrof_examples_per_class)
+    logger.info('Building equal batches input pipeline.')
+    logger.info('Number of classes per batch: {nrof_classes}', nrof_classes=config.nrof_classes_per_batch)
+    logger.info('Number of examples per class: {nrof_examples}', nrof_examples=config.nrof_examples_per_class)
 
     def generator():
         while True:
@@ -118,9 +99,13 @@ def equal_batches_input_pipeline(embeddings, config):
     batch_size = config.nrof_classes_per_batch * config.nrof_examples_per_class
     ds = ds.batch(batch_size)
 
-    next_elem = ds.make_one_shot_iterator().get_next()
+    info = (f'{ds}\n' +
+            f'batch size: {batch_size}\n' +
+            f'cardinality: {ds.cardinality()}')
 
-    return next_elem
+    logger.info('\n' + info)
+
+    return ds
 
 
 def evaluate_embeddings(model, tf_dataset):
@@ -157,12 +142,13 @@ def center_loss(features, label, alfa, nrof_classes):
     return loss, centers
 
 
-def split_embeddings(embeddings, labels):
-    list_of_embeddings = []
+def split_embeddings(embarray: np.array, labels: np.array) -> List[np.array]:
+    embeddings = []
+
     for label in np.unique(labels):
-        emb_array = embeddings[label == labels]
-        list_of_embeddings.append(emb_array)
-    return list_of_embeddings
+        embeddings.append(embarray[label == labels])
+
+    return embeddings
 
 
 class Embeddings:

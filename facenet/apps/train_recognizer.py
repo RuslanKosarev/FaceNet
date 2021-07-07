@@ -12,7 +12,7 @@ from loguru import logger
 import tensorflow as tf
 import numpy as np
 
-from facenet import config, facenet, faceclass, ioutils, logging
+from facenet import config, facenet, faceclass, ioutils, h5utils
 
 
 class ConfusionMatrix:
@@ -86,47 +86,47 @@ def binary_cross_entropy_loss(logits, options):
 
 
 @click.command()
-@click.option('--config', default=None, type=Path,
-              help='Path to yaml config file with used options for the application.')
-def main(**options):
-    options = config.train_classifier(options)
-    logging.configure_logging(options.logs)
+@click.option('-m', '--model', type=Path, required=True,
+              help='Path to directory with saved model.')
+def main(model: Path):
 
-    embeddings = facenet.Embeddings(options.embeddings)
-    ioutils.write_text_log(options.logfile, embeddings)
-    print(embeddings)
+    cfg = config.train_recognizer(model)
 
-    embarray = embeddings.data(normalize=options.embeddings.normalize)
+    h5file = list(model.glob('*.h5'))[0]
+    embeddings = h5utils.read(h5file, 'embeddings')
+    labels = h5utils.read(h5file, 'labels')
 
-    next_elem = facenet.equal_batches_input_pipeline(embarray, options)
+    embeddings = facenet.split_embeddings(embeddings, labels)
 
-    embeddings_batch = tf.placeholder(tf.float32, shape=[None, embeddings.length], name='embeddings_batch')
+    cfg.recognizer.nrof_classes_per_batch = 8
+    cfg.recognizer.nrof_examples_per_class = 8
+    tf_train_dataset = facenet.equal_batches_input_pipeline(embeddings, cfg.recognizer)
 
     # define classifier
-    if options.embeddings.normalize:
+    if cfg.embeddings.normalize:
         model = faceclass.FaceToFaceNormalizedEmbeddingsClassifier()
     else:
         model = faceclass.FaceToFaceDistanceClassifier()
 
     logits = model(embeddings_batch)
-    cross_entropy = binary_cross_entropy_loss(logits, options)
+    cross_entropy = binary_cross_entropy_loss(logits, cfg)
 
     # define train operations
     global_step = tf.Variable(0, trainable=False, name='global_step')
 
     dtype = tf.float64
-    initial_learning_rate = tf.constant(options.train.learning_rate_schedule.initial_value, dtype=dtype)
-    decay_rate = tf.constant(options.train.learning_rate_schedule.decay_rate, dtype=dtype)
+    initial_learning_rate = tf.constant(cfg.train.learning_rate_schedule.initial_value, dtype=dtype)
+    decay_rate = tf.constant(cfg.train.learning_rate_schedule.decay_rate, dtype=dtype)
 
-    if not options.train.learning_rate_schedule.decay_steps:
-        decay_steps = tf.constant(options.train.epoch.size, dtype=dtype)
+    if not cfg.train.learning_rate_schedule.decay_steps:
+        decay_steps = tf.constant(cfg.train.epoch.size, dtype=dtype)
     else:
-        decay_steps = tf.constant(options.train.learning_rate_schedule.decay_steps, dtype=dtype)
+        decay_steps = tf.constant(cfg.train.learning_rate_schedule.decay_steps, dtype=dtype)
 
     lr_decay_factor = tf.math.pow(decay_rate, tf.math.floor(tf.cast(global_step, dtype=dtype) / decay_steps))
     learning_rate = initial_learning_rate * lr_decay_factor
 
-    train_ops = facenet.train_op(options.train, cross_entropy, global_step, learning_rate, tf.global_variables())
+    train_ops = facenet.train_op(cfg.train, cross_entropy, global_step, learning_rate, tf.global_variables())
 
     tensor_ops = {
         'global_step': global_step,
@@ -140,9 +140,9 @@ def main(**options):
     with tf.Session() as session:
         session.run([tf.global_variables_initializer(), tf.local_variables_initializer()])
 
-        for epoch in range(options.train.epoch.max_nrof_epochs):
-            with tqdm(total=options.train.epoch.size) as bar:
-                for _ in range(options.train.epoch.size):
+        for epoch in range(cfg.train.epoch.max_nrof_epochs):
+            with tqdm(total=cfg.train.epoch.size) as bar:
+                for _ in range(cfg.train.epoch.size):
                     embeddings_batch_np = session.run(next_elem)
                     feed_dict = {embeddings_batch: embeddings_batch_np}
 
@@ -152,15 +152,15 @@ def main(**options):
                     bar.set_postfix_str(postfix)
                     bar.update()
 
-            info = f"epoch [{epoch + 1}/{options.train.epoch.max_nrof_epochs}], learning rate {outs['learning_rate']}"
+            info = f"epoch [{epoch + 1}/{cfg.train.epoch.max_nrof_epochs}], learning rate {outs['learning_rate']}"
             print(info)
 
             conf_mat = ConfusionMatrix(embarray, model)
             print(conf_mat)
-            ioutils.write_text_log(options.logfile, info)
-            ioutils.write_text_log(options.logfile, conf_mat)
+            ioutils.write_text_log(cfg.logfile, info)
+            ioutils.write_text_log(cfg.logfile, conf_mat)
 
-    print(f'Model has been saved to the directory: {options.classifier.path}')
+    print(f'Model has been saved to the directory: {cfg.classifier.path}')
 
 
 if __name__ == '__main__':

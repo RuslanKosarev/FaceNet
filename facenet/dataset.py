@@ -152,7 +152,7 @@ class Database:
     def nrof_images_per_class(self):
         return [cls.nrof_images for cls in self.classes]
 
-    def tf_dataset_api(self, loader, batch_size, buffer_size=None, repeat=False):
+    def tf_dataset_api(self, *, loader, batch_size, buffer_size=None, repeat=False):
         return tf_dataset_api(self.files,
                               self.labels,
                               loader,

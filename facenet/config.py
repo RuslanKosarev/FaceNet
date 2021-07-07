@@ -3,14 +3,13 @@ __author__ = 'Ruslan N. Kosarev'
 
 from pathlib import Path
 from datetime import datetime
-
 from omegaconf import OmegaConf
 
 import random
 import numpy as np
 import tensorflow as tf
 
-from facenet import ioutils
+from facenet import ioutils, logging
 
 # directory for default configs
 default_config_dir = Path(__file__).parents[0].joinpath('apps', 'configs')
@@ -213,6 +212,8 @@ def evaluate_embeddings(options):
     # write arguments and store some git revision info in a text files in the log directory
     ioutils.write_arguments(cfg, cfg.logs.dir)
     ioutils.store_revision_info(cfg.logs.dir)
+
+    logging.configure_logging(cfg.logs)
 
     return cfg
 

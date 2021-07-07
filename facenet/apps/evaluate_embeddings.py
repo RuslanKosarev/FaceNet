@@ -7,10 +7,9 @@
 import click
 from pathlib import Path
 from loguru import logger
-
 import tensorflow as tf
 
-from facenet import config, facenet, tfutils, ioutils, h5utils, logging
+from facenet import config, facenet, h5utils
 from facenet.dataset import Database
 
 
@@ -19,12 +18,11 @@ from facenet.dataset import Database
               help='Path to yaml config file with used options for the application.')
 def main(**cfg):
     cfg = config.evaluate_embeddings(cfg)
-    logging.configure_logging(cfg.logs)
 
     loader = facenet.ImageLoader(config=cfg.image)
     dataset = Database(cfg.dataset)
     tf_dataset = dataset.tf_dataset_api(
-        loader,
+        loader=loader,
         batch_size=cfg.batch_size
     )
 
@@ -35,8 +33,8 @@ def main(**cfg):
     h5utils.write(cfg.h5file, 'embeddings', embeddings)
     h5utils.write(cfg.h5file, 'labels', labels)
 
-    logger.info('Output h5 file: %s', cfg.outfile)
-    logger.info('Number of examples: %s', dataset.nrof_images)
+    logger.info('Output h5 file: {file}', file=cfg.outfile)
+    logger.info('Number of examples: {count}', count=dataset.nrof_images)
 
 
 if __name__ == '__main__':

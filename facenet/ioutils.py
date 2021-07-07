@@ -41,7 +41,7 @@ def write_elapsed_time(files, start_time):
                 f.write('elapsed time: {:.3f}\n'.format(elapsed_time))
 
 
-def store_revision_info(output_filename, mode='a'):
+def store_revision_info(output_filename, mode='w'):
     output_filename = Path(output_filename)
 
     if output_filename.is_dir():
@@ -95,7 +95,7 @@ def git_diff():
     return info
 
 
-def write_arguments(args, path, mode='a'):
+def write_arguments(cfg, path, mode='w'):
     path = Path(path).expanduser()
     name = Path(sys.argv[0]).stem + '.yaml'
 
@@ -104,7 +104,7 @@ def write_arguments(args, path, mode='a'):
     makedirs(file.parent)
 
     with file.open(mode=mode) as f:
-        f.write('{}\n'.format(str(args)))
+        f.write('{}\n'.format(str(cfg)))
 
 
 def write_image(image, filename, prefix=None, mode='RGB'):

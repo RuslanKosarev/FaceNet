@@ -32,8 +32,8 @@ def main(**cfg):
 
     embeddings, labels = facenet.evaluate_embeddings(model, tf_dataset)
 
-    h5utils.write(cfg.outfile, 'embeddings', embeddings)
-    h5utils.write(cfg.outfile, 'labels', labels)
+    h5utils.write(cfg.h5file, 'embeddings', embeddings)
+    h5utils.write(cfg.h5file, 'labels', labels)
 
     logger.info('Output h5 file: %s', cfg.outfile)
     logger.info('Number of examples: %s', dataset.nrof_images)

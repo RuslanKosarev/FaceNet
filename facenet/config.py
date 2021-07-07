@@ -203,9 +203,8 @@ def evaluate_embeddings(options):
     if not cfg.model.path:
         cfg.model.path = default_model_path
 
-    cfg.outdir = Path(cfg.dataset.path + '_' + Path(cfg.model.path).stem)
-    cfg.outdir = Path(cfg.outdir).expanduser()
-    cfg.outfile = cfg.outdir / 'embeddings.h5'
+    cfg.outdir = Path(cfg.dataset.path + '_' + Path(cfg.model.path).stem).expanduser()
+    cfg.h5file = cfg.outdir / 'embeddings.h5'
 
     cfg.logs = Config()
     cfg.logs.dir = cfg.outdir

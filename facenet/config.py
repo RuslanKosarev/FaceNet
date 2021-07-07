@@ -1,6 +1,7 @@
 # coding: utf-8
 __author__ = 'Ruslan N. Kosarev'
 
+from typing import Union
 from pathlib import Path
 from datetime import datetime
 from omegaconf import OmegaConf
@@ -10,6 +11,8 @@ import numpy as np
 import tensorflow as tf
 
 from facenet import ioutils, logging
+
+PathType = Union[Path, str]
 
 # directory for default configs
 default_config_dir = Path(__file__).parents[0].joinpath('apps', 'configs')
@@ -22,8 +25,7 @@ user_config_dir = Path(__file__).parents[1] / 'configs'
 default_model_path = Path(__file__).parents[1] / 'models/default'
 
 user_config = user_config_dir / 'config.yaml'
-default_train_classifier_config = default_config_dir / 'train_classifier.yaml'
-default_train_recognizer_config = default_config_dir / 'train_recognizer.yaml'
+default_train_config = default_config_dir / 'train_config.yaml'
 default_evaluate_embeddings_config = default_config_dir / 'evaluate_embeddings.yaml'
 
 
@@ -31,7 +33,7 @@ def subdir() -> str:
     return datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S')
 
 
-def config_paths(app_file_name, custom_config_file):
+def config_paths(app_file_name, custom_config_file=None):
     config_name = Path(app_file_name).stem + '.yaml'
 
     paths = [
@@ -48,6 +50,12 @@ def config_paths(app_file_name, custom_config_file):
 
 
 def set_seed(seed):
+    """
+    set seed for random number generators
+
+    :param seed:
+    :return:
+    """
     random.seed(seed)
     np.random.seed(seed)
     tf.random.set_seed(seed)
@@ -113,14 +121,14 @@ class LoadConfigError(Exception):
     pass
 
 
-def load_config(app_file_name, options):
+def load_config(app_file_name, file=None):
     """Load configuration from the set of config files
     :param app_file_name
-    :param options: Optional path to the custom config file
+    :param file: Optional path to the custom config file
     :return: The validated config in Config model instance
     """
 
-    paths = config_paths(app_file_name, options['config'])
+    paths = config_paths(app_file_name, file)
 
     cfg = OmegaConf.create()
     new_cfg = None
@@ -177,20 +185,20 @@ def train_classifier(options):
     return cfg
 
 
-def train_recognizer(options):
-    cfg = load_config(default_train_recognizer_config, options)
+def train_recognizer(path: PathType):
+    path = Path(path)
+    file = list(path.glob('*/*.yaml'))[0]
+    cfg = load_config(default_train_config, file)
 
-    # set seed for random number generators
     set_seed(cfg.seed)
 
-    cfg.classifier.path = Path(cfg.classifier.path).expanduser() / subdir()
+    cfg.outdir = path / 'recognizer' / subdir()
+    cfg.logfile = cfg.outdir / 'log.txt'
 
-    cfg.logdir = cfg.classifier.path
-    cfg.logfile = cfg.logdir / 'log.txt'
+    ioutils.write_arguments(cfg.outdir, cfg)
+    ioutils.store_revision_info(cfg.outdir)
 
-    # write arguments and store some git revision info in a text files in the log directory
-    ioutils.write_arguments(cfg, cfg.logdir.joinpath(Path(app_file_name).stem + '.yaml'))
-    ioutils.store_revision_info(cfg.logdir)
+    logging.configure_logging(cfg.logfile)
 
     return cfg
 

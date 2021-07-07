@@ -6,6 +6,7 @@ import sys
 import platform
 import time
 import numpy as np
+from typing import Union
 from functools import partial
 from pathlib import Path
 import datetime
@@ -14,6 +15,7 @@ from PIL import Image
 from subprocess import Popen, PIPE
 from facenet import config, h5utils
 
+PathType = Union[Path, str]
 
 makedirs = partial(Path.mkdir, parents=True, exist_ok=True)
 
@@ -95,7 +97,7 @@ def git_diff():
     return info
 
 
-def write_arguments(cfg, path, mode='w'):
+def write_arguments(path: PathType, cfg, mode: str='w'):
     path = Path(path).expanduser()
     name = Path(sys.argv[0]).stem + '.yaml'
 

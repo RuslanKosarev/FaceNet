@@ -14,7 +14,7 @@ def write(file: Union[Path, str], path: str, data, mode='a'):
         hf[path][...] = data
 
 
-def read(file, path, **kwargs):
+def read(file: Union[Path, str], path: str, **kwargs):
 
     file = Path(file).expanduser()
 

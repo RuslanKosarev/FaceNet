@@ -4,7 +4,7 @@ __author__ = 'Ruslan N. Kosarev'
 from typing import Union
 from pathlib import Path
 from datetime import datetime
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, DictConfig
 
 import random
 import numpy as np
@@ -204,28 +204,23 @@ def train_recognizer(path: PathType):
 
 
 def evaluate_embeddings(options):
-    cfg = load_config(default_evaluate_embeddings_config, options)
+    options = load_config(default_evaluate_embeddings_config, options)
 
     # set seed for random number generators
-    set_seed(cfg.seed)
+    set_seed(options.seed)
 
-    if not cfg.model.path:
-        cfg.model.path = default_model_path
-
-    cfg.outdir = Path(cfg.dataset.path + '_' + Path(cfg.model.path).stem).expanduser()
-    cfg.h5file = cfg.outdir / 'embeddings.h5'
-
-    cfg.logs = Config()
-    cfg.logs.dir = cfg.outdir
-    cfg.logs.file = cfg.outdir / 'log.txt'
+    options.model.path = Path(options.model.path).expanduser()
+    options.outdir = Path(options.dataset.path + '_' + options.model.path.stem).expanduser()
+    options.h5file = options.outdir / 'embeddings.h5'
+    options.logfile = options.outdir / 'log.txt'
 
     # write arguments and store some git revision info in a text files in the log directory
-    ioutils.write_arguments(cfg, cfg.logs.dir)
-    ioutils.store_revision_info(cfg.logs.dir)
+    ioutils.write_arguments(options.outdir, options)
+    ioutils.store_revision_info(options.outdir)
 
-    logging.configure_logging(cfg.logs)
+    logging.configure_logging(options.logfile)
 
-    return cfg
+    return options
 
 
 

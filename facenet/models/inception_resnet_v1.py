@@ -494,8 +494,8 @@ class InceptionResnetV1(keras.Model):
             output = layer(output)
 
         # normalize embeddings
-        if not training:
-            output = tf.nn.l2_normalize(output, axis=1, epsilon=1e-10, name='embedding')
+        # if not training:
+        #     output = tf.nn.l2_normalize(output, axis=1, epsilon=1e-10, name='embedding')
 
         return output
 

@@ -1,8 +1,6 @@
 """Validate a face recognizer.
 """
-# MIT License
-#
-# Copyright (c) 2020 SMedX
+
 
 import click
 from pathlib import Path

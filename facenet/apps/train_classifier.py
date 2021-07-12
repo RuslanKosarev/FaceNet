@@ -29,13 +29,13 @@ def main(**options):
     loader = facenet.ImageLoader(config=cfg.image)
 
     train_dataset = Database(cfg.train.dataset)
-    tf_train_dataset = train_dataset.tf_dataset_api(loader,
+    tf_train_dataset = train_dataset.tf_dataset_api(loader=loader,
                                                     batch_size=cfg.batch_size,
                                                     repeat=True,
                                                     buffer_size=10)
 
     test_dataset = Database(cfg.test.dataset)
-    tf_test_dataset = test_dataset.tf_dataset_api(loader,
+    tf_test_dataset = test_dataset.tf_dataset_api(loader=loader,
                                                   batch_size=cfg.batch_size,
                                                   repeat=False,
                                                   buffer_size=None)

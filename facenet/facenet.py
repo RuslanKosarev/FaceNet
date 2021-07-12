@@ -4,23 +4,16 @@
 from typing import List
 from tqdm import tqdm
 from loguru import logger
-from pathlib import Path
 
 import random
 import numpy as np
 import tensorflow as tf
 
-from facenet import nodes, h5utils, FaceNet
+from facenet import nodes
 
 
 def inputs(config):
     return tf.keras.Input([config.size, config.size, 3])
-
-
-def softmax_cross_entropy_with_logits(logits, labels):
-    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits)
-    cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
-    return cross_entropy_mean
 
 
 class ImageLoader:

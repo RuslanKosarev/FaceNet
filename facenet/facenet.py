@@ -126,100 +126,18 @@ def evaluate_embeddings(model, tf_dataset):
     return np.concatenate(embeddings), np.concatenate(labels)
 
 
-def center_loss(features, label, alfa, nrof_classes):
-    """Center loss based on the paper "A Discriminative Feature Learning Approach for Deep Face Recognition"
-       (http://ydwen.github.io/papers/WenECCV16.pdf)
+def split_embeddings(embeddings: np.array, labels: np.array) -> List[np.array]:
     """
-    nrof_features = features.get_shape()[1]
-    centers = tf.get_variable('centers', [nrof_classes, nrof_features], dtype=tf.float32,
-        initializer=tf.constant_initializer(0), trainable=False)
-    label = tf.reshape(label, [-1])
-    centers_batch = tf.gather(centers, label)
-    diff = (1 - alfa) * (centers_batch - features)
-    centers = tf.scatter_sub(centers, label, diff)
-    with tf.control_dependencies([centers]):
-        loss = tf.reduce_mean(tf.square(features - centers_batch))
-    return loss, centers
+    Split input 2D array of embeddings into list of embeddings, each element of list corresponds unique class
 
+    :param embeddings:
+    :param labels:
+    :return:
+    """
 
-def split_embeddings(embarray: np.array, labels: np.array) -> List[np.array]:
-    embeddings = []
-
-    for label in np.unique(labels):
-        embeddings.append(embarray[label == labels])
+    embeddings = [embeddings[label == labels] for label in np.unique(labels)]
 
     return embeddings
-
-
-class Embeddings:
-    def __init__(self, config):
-        self.config = config
-        self.file = Path(config.path).expanduser()
-
-        embeddings = h5utils.read(self.file, 'embeddings')
-        labels = h5utils.read(self.file, 'labels')
-
-        self.embeddings = split_embeddings(embeddings, labels)
-
-        if self.config.nrof_classes:
-            if self.nrof_classes > self.config.nrof_classes:
-                labels = [_ for _ in range(self.nrof_classes)]
-                labels = random.sample(labels, self.config.nrof_classes)
-
-                self.embeddings = [self.embeddings[label] for label in labels]
-
-        if self.config.max_nrof_images:
-            for idx, emb in enumerate(self.embeddings):
-                nrof_images = emb.shape[0]
-
-                if nrof_images > self.config.max_nrof_images:
-                    labels = [_ for _ in range(nrof_images)]
-                    labels = random.sample(labels, self.config.max_nrof_images)
-
-                    self.embeddings[idx] = self.embeddings[idx][labels, :]
-
-    def __repr__(self):
-        """Representation of the embeddings"""
-        data = [len(e) for e in self.embeddings]
-
-        embeddings = np.concatenate(self.embeddings, axis=0)
-        norm = np.linalg.norm(embeddings, axis=1)
-
-        info = (f'{self.__class__.__name__}\n' +
-                f'Input file {self.file}\n' +
-                f'Number of classes {self.nrof_classes} \n' +
-                f'Number of images {self.nrof_images}\n' +
-                f'Minimal number of images in class {min(data)}\n' +
-                f'Maximal number of images in class {max(data)}\n' +
-                '\n' +
-                f'Minimal embedding {np.min(norm)}\n' +
-                f'Maximal embedding {np.max(norm)}\n' +
-                f'Mean embedding {np.mean(norm)}\n'
-                )
-
-        return info
-
-    @property
-    def nrof_classes(self):
-        return len(self.embeddings)
-
-    @property
-    def nrof_images(self):
-        return sum([len(e) for e in self.embeddings])
-
-    @property
-    def length(self):
-        return self.embeddings[0].shape[1]
-
-    def data(self, normalize=False):
-
-        embeddings = self.embeddings
-
-        if normalize:
-            for idx in range(self.nrof_classes):
-                embeddings[idx] /= np.linalg.norm(self.embeddings[idx], axis=1, keepdims=True)
-
-        return embeddings
 
 
 class LearningRateScheduler:

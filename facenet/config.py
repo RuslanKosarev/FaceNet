@@ -155,7 +155,6 @@ def load_config(app_file_name, file=None):
 def train_classifier(options):
     cfg = load_config(default_train_classifier_config, options)
 
-    # set seed for random number generators
     set_seed(cfg.seed)
 
     path = Path(cfg.model.path).expanduser()
@@ -176,7 +175,7 @@ def train_classifier(options):
         cfg.validate.image.size = cfg.image.size
         cfg.validate.image.standardization = cfg.image.standardization
 
-    # write arguments and store some git revision info in a text files in the log directory
+    # write arguments and some git revision info
     ioutils.write_arguments(cfg, cfg.logs.dir)
     ioutils.store_revision_info(cfg.logs.dir)
 
@@ -186,27 +185,25 @@ def train_classifier(options):
 
 
 def train_recognizer(path: PathType):
-    path = Path(path)
-    file = list(path.glob('*/*.yaml'))[0]
-    cfg = load_config(default_train_config, file)
+    options = load_config(default_train_config, path)
 
-    set_seed(cfg.seed)
+    set_seed(options.seed)
 
-    cfg.outdir = path / 'recognizer' / subdir()
-    cfg.logfile = cfg.outdir / 'log.txt'
+    options.outdir = path / 'recognizer' / subdir()
+    options.logfile = options.outdir / 'log.txt'
 
-    ioutils.write_arguments(cfg.outdir, cfg)
-    ioutils.store_revision_info(cfg.outdir)
+    # write arguments and some git revision info
+    ioutils.write_arguments(options.outdir, options)
+    ioutils.store_revision_info(options.outdir)
 
-    logging.configure_logging(cfg.logfile)
+    logging.configure_logging(options.logfile)
 
-    return cfg
+    return options
 
 
 def evaluate_embeddings(options):
     options = load_config(default_evaluate_embeddings_config, options)
 
-    # set seed for random number generators
     set_seed(options.seed)
 
     options.model.path = Path(options.model.path).expanduser()
@@ -214,7 +211,7 @@ def evaluate_embeddings(options):
     options.h5file = options.outdir / 'embeddings.h5'
     options.logfile = options.outdir / 'log.txt'
 
-    # write arguments and store some git revision info in a text files in the log directory
+    # write arguments and some git revision info
     ioutils.write_arguments(options.outdir, options)
     ioutils.store_revision_info(options.outdir)
 

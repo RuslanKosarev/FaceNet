@@ -8,11 +8,12 @@ import click
 from tqdm import tqdm
 from pathlib import Path
 from loguru import logger
+from tensorflow import keras
 
 import tensorflow as tf
 import numpy as np
 
-from facenet import config, facenet, faceclass, ioutils, h5utils
+from facenet import config, facenet, facerecognizer, ioutils, h5utils
 
 
 class ConfusionMatrix:
@@ -50,7 +51,7 @@ class ConfusionMatrix:
         self.tn_rate = tn / (tn + fp)
 
     def __repr__(self):
-        return (f'{self.__class__.__name__}\n' +
+        return (f'{type(self).__name__}\n' +
                 f'{str(self.classifier)}\n' +
                 f'accuracy  {self.accuracy}\n' +
                 f'precision {self.precision}\n' +
@@ -58,15 +59,15 @@ class ConfusionMatrix:
                 f'tn rate   {self.tn_rate}\n')
 
 
-def binary_cross_entropy_loss(logits, options):
+def binary_cross_entropy_loss(logits, cfg):
     # define upper-triangle indices
-    batch_size = options.nrof_classes_per_batch * options.nrof_examples_per_class
+    batch_size = cfg.nrof_classes_per_batch * cfg.nrof_examples_per_class
     triu_indices = [(i, k) for i, k in zip(*np.triu_indices(batch_size, k=1))]
 
     # compute labels for embeddings
     labels = []
     for i, k in triu_indices:
-        if (i // options.nrof_examples_per_class) == (k // options.nrof_examples_per_class):
+        if (i // cfg.nrof_examples_per_class) == (k // cfg.nrof_examples_per_class):
             # label 1 means inner class distance
             labels.append(1)
         else:
@@ -90,7 +91,7 @@ def binary_cross_entropy_loss(logits, options):
               help='Path to directory with saved model.')
 def main(model: Path):
 
-    cfg = config.train_recognizer(model)
+    options = config.train_recognizer(model)
 
     h5file = list(model.glob('*.h5'))[0]
     embeddings = h5utils.read(h5file, 'embeddings')
@@ -98,69 +99,38 @@ def main(model: Path):
 
     embeddings = facenet.split_embeddings(embeddings, labels)
 
-    cfg.recognizer.nrof_classes_per_batch = 8
-    cfg.recognizer.nrof_examples_per_class = 8
-    tf_train_dataset = facenet.equal_batches_input_pipeline(embeddings, cfg.recognizer)
+    options.recognizer.nrof_classes_per_batch = 16
+    options.recognizer.nrof_examples_per_class = 16
+    tf_train_dataset = facenet.equal_batches_input_pipeline(embeddings, options.recognizer)
 
     # define classifier
-    if cfg.embeddings.normalize:
-        model = faceclass.FaceToFaceNormalizedEmbeddingsClassifier()
-    else:
-        model = faceclass.FaceToFaceDistanceClassifier()
+    input_shape = tf.keras.Input([embeddings[0].shape[1]])
+    model = facerecognizer.FaceToFaceRecognizer(input_shape)
+    model.summary()
 
-    logits = model(embeddings_batch)
-    cross_entropy = binary_cross_entropy_loss(logits, cfg)
+    epochs = 100
+    nrof_step = 100
+    # optimizer = keras.optimizers.SGD(learning_rate=0.0001)
+    optimizer = tf.keras.optimizers.Adam(epsilon=0.01)
 
-    # define train operations
-    global_step = tf.Variable(0, trainable=False, name='global_step')
+    for epoch in range(epochs):
+        for step, x_batch_train, in enumerate(tf_train_dataset):
+            if step > nrof_step:
+                break
 
-    dtype = tf.float64
-    initial_learning_rate = tf.constant(cfg.train.learning_rate_schedule.initial_value, dtype=dtype)
-    decay_rate = tf.constant(cfg.train.learning_rate_schedule.decay_rate, dtype=dtype)
+            # Run the forward pass of the layer
+            with tf.GradientTape() as tape:
+                logits = model.call(x_batch_train)
+                loss_value = binary_cross_entropy_loss(logits, options.recognizer)
 
-    if not cfg.train.learning_rate_schedule.decay_steps:
-        decay_steps = tf.constant(cfg.train.epoch.size, dtype=dtype)
-    else:
-        decay_steps = tf.constant(cfg.train.learning_rate_schedule.decay_steps, dtype=dtype)
+            grads = tape.gradient(loss_value, model.trainable_weights)
+            optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
-    lr_decay_factor = tf.math.pow(decay_rate, tf.math.floor(tf.cast(global_step, dtype=dtype) / decay_steps))
-    learning_rate = initial_learning_rate * lr_decay_factor
+        print(f'Training loss (for one batch) at {epoch}: {loss_value}')
+        print(model.alpha.numpy(), model.threshold.numpy())
 
-    train_ops = facenet.train_op(cfg.train, cross_entropy, global_step, learning_rate, tf.global_variables())
-
-    tensor_ops = {
-        'global_step': global_step,
-        'loss': cross_entropy,
-        'vars': tf.trainable_variables(),
-        'learning_rate': learning_rate
-    }
-
-    print('start training')
-
-    with tf.Session() as session:
-        session.run([tf.global_variables_initializer(), tf.local_variables_initializer()])
-
-        for epoch in range(cfg.train.epoch.max_nrof_epochs):
-            with tqdm(total=cfg.train.epoch.size) as bar:
-                for _ in range(cfg.train.epoch.size):
-                    embeddings_batch_np = session.run(next_elem)
-                    feed_dict = {embeddings_batch: embeddings_batch_np}
-
-                    _, outs = session.run([train_ops, tensor_ops], feed_dict=feed_dict)
-
-                    postfix = f"variables {outs['vars']}, loss {outs['loss']}"
-                    bar.set_postfix_str(postfix)
-                    bar.update()
-
-            info = f"epoch [{epoch + 1}/{cfg.train.epoch.max_nrof_epochs}], learning rate {outs['learning_rate']}"
-            print(info)
-
-            conf_mat = ConfusionMatrix(embarray, model)
-            print(conf_mat)
-            ioutils.write_text_log(cfg.logfile, info)
-            ioutils.write_text_log(cfg.logfile, conf_mat)
-
-    print(f'Model has been saved to the directory: {cfg.classifier.path}')
+    conf_mat = ConfusionMatrix(embeddings, model)
+    print(conf_mat)
 
 
 if __name__ == '__main__':

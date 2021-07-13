@@ -3,6 +3,7 @@ __author__ = 'Ruslan N. Kosarev'
 
 import numpy as np
 import tensorflow as tf
+from tensorflow import keras
 
 
 class FaceToFaceDistanceClassifier:
@@ -76,41 +77,30 @@ class FaceToFaceDistanceClassifier:
         return self.distance(x, y) < self.variable('threshold', mode='numpy')
 
 
-class FaceToFaceNormalizedEmbeddingsClassifier:
-    def __init__(self):
-        self.variables = {
-            'alpha': tf.Variable(initial_value=10.0, dtype=tf.float32, name='alpha'),
-            'threshold': tf.Variable(initial_value=1.0, dtype=tf.float32, name='threshold')
-        }
+class FaceToFaceRecognizer(keras.Model):
+    def __init__(self, input_shape):
+        super().__init__()
+        prefix = type(self).__name__
 
-    def __call__(self, x, y=None):
-        alpha = self.variable('alpha')
-        threshold = self.variable('threshold')
-        logits = tf.multiply(alpha, tf.subtract(threshold, self.distance(x, y)))
+        self.alpha = tf.Variable(1, name=f'{prefix}/alpha', trainable=True, dtype=tf.float32)
+        self.threshold = tf.Variable(1, name=f'{prefix}/threshold', trainable=True, dtype=tf.float32)
+
+        self(input_shape) # noqa
+
+    def call(self, x, y=None):
+        logits = tf.multiply(self.alpha, tf.subtract(self.threshold, self.distance(x, y)))
         return logits
 
-    def __repr__(self):
-        variables = {}
-        for name in self.variables.keys():
-            variables[name] = self.variable(name, mode='numpy')
+    @staticmethod
+    def distance(x, y=None):
+        x = tf.nn.l2_normalize(x, axis=1)
 
-        return (f'{self.__class__.__name__}\n'
-                f'variables {variables}\n')
-
-    def variable(self, name, mode=None):
-        var = self.variables[name]
-        if mode == 'numpy':
-            var = tf.get_default_session().run(var)
-        return var
-
-    def distance(self, x, y):
-        if y is None:
+        if y is not None:
+            y = tf.nn.l2_normalize(y, axis=1)
+        else:
             y = x
 
-        if isinstance(x, np.ndarray):
-            dist = 2 * (1 - x @ np.transpose(y))
-        else:
-            dist = 2 * (1 - x @ tf.transpose(y))
+        dist = 2 * (1 - x @ tf.transpose(y))
 
         return dist
 

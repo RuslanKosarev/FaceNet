@@ -17,7 +17,7 @@ from facenet import config, facenet, facerecognizer, ioutils, h5utils
 
 
 class ConfusionMatrix:
-    def __init__(self, embeddings, classifier):
+    def __init__(self, embeddings, model):
         nrof_classes = len(embeddings)
         nrof_positive_class_pairs = nrof_classes
         nrof_negative_class_pairs = nrof_classes * (nrof_classes - 1) / 2
@@ -26,13 +26,13 @@ class ConfusionMatrix:
 
         for i in range(nrof_classes):
             for k in range(i):
-                outs = classifier.predict(embeddings[i], embeddings[k])
+                outs = model.predict(embeddings[i], embeddings[k])
                 mean = np.mean(outs)
 
                 fp += mean
                 tn += 1 - mean
 
-            outs = classifier.predict(embeddings[i])
+            outs = model.predict(embeddings[i])
             mean = np.mean(outs)
 
             tp += mean
@@ -44,7 +44,7 @@ class ConfusionMatrix:
         fp /= nrof_negative_class_pairs
         tn /= nrof_negative_class_pairs
 
-        self.classifier = type(classifier).__name__
+        self.model = type(model).__name__
         self.accuracy = (tp + tn) / (tp + fp + tn + fn)
         self.precision = tp / (tp + fp)
         self.tp_rate = tp / (tp + fn)
@@ -52,7 +52,7 @@ class ConfusionMatrix:
 
     def __repr__(self):
         return (f'{type(self).__name__}\n' +
-                f'{str(self.classifier)}\n' +
+                f'{str(self.model)}\n' +
                 f'accuracy  {self.accuracy}\n' +
                 f'precision {self.precision}\n' +
                 f'tp rate   {self.tp_rate}\n' +
@@ -108,7 +108,7 @@ def main(model: Path):
     model = facerecognizer.FaceToFaceRecognizer(input_shape)
     model.summary()
 
-    nrof_epochs = 10000
+    nrof_epochs = 100
     optimizer = tf.keras.optimizers.Adam(epsilon=0.1, learning_rate=0.001)
 
     for epoch, x_batch_train, in enumerate(tf_train_dataset):

@@ -99,8 +99,8 @@ def main(model: Path):
 
     embeddings = facenet.split_embeddings(embeddings, labels)
 
-    options.recognizer.nrof_classes_per_batch = 32
-    options.recognizer.nrof_examples_per_class = 32
+    options.recognizer.nrof_classes_per_batch = 8
+    options.recognizer.nrof_examples_per_class = 8
     tf_train_dataset = facenet.equal_batches_input_pipeline(embeddings, options.recognizer)
 
     # define classifier
@@ -108,13 +108,11 @@ def main(model: Path):
     model = facerecognizer.FaceToFaceRecognizer(input_shape)
     model.summary()
 
-    nrof_epochs = 1000
-
-    # optimizer = keras.optimizers.SGD(learning_rate=0.0001)
-    optimizer = tf.keras.optimizers.Adam(epsilon=0.01)
+    nrof_epochs = 10000
+    optimizer = tf.keras.optimizers.Adam(epsilon=0.1, learning_rate=0.001)
 
     for epoch, x_batch_train, in enumerate(tf_train_dataset):
-        if epoch >= nrof_epochs:
+        if epoch > nrof_epochs:
             break
 
         with tf.GradientTape() as tape:
@@ -124,7 +122,7 @@ def main(model: Path):
         grads = tape.gradient(loss_value, model.trainable_weights)
         optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
-        if epoch % 50 == 0:
+        if epoch % 100 == 0 or epoch+1 == nrof_epochs:
             print(f'Training loss (for one batch) {epoch}: {loss_value}')
             print(model.alpha.numpy(), model.threshold.numpy())
 

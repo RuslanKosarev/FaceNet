@@ -115,7 +115,7 @@ def main(model: Path):
 
     from omegaconf import DictConfig
     schedule = DictConfig({'value': None,
-                           'schedule': [[5, 0.01], [10, 0.001], [15, 0.0001]]
+                           'schedule': [[10, 0.01], [20, 0.001], [30, 0.0001]]
                            })
     nrof_epochs = schedule.schedule[-1][0]
 

@@ -18,37 +18,27 @@ from facenet import config, facenet, facerecognizer, ioutils, h5utils
 
 
 class ConfusionMatrix:
-    def __init__(self, embeddings, model, block2row=True):
+    def __init__(self, embeddings, model):
         nrof_classes = len(embeddings)
         nrof_positive_class_pairs = nrof_classes
         nrof_negative_class_pairs = nrof_classes * (nrof_classes - 1) / 2
 
         tp = tn = fp = fn = 0
 
+        # evaluate confusion matrix block by block
         for i in range(nrof_classes):
-            if block2row:
-                # evaluate confusion matrix block by row
-                if i > 0:
-                    row_embeddings = np.concatenate(embeddings[:i], axis=0)
-                    outs = model.predict(row_embeddings, embeddings[i])
-                    mean = np.mean(outs)
-
-                    fp += mean * i
-                    tn += (1 - mean) * i
-            else:
-                # evaluate confusion matrix block by block
-                for k in range(i):
-                    outs = model.predict(embeddings[i], embeddings[k])
-                    mean = np.mean(outs)
-
-                    fp += mean
-                    tn += 1 - mean
-
             outs = model.predict(embeddings[i])
             mean = np.mean(outs)
 
             tp += mean
             fn += 1 - mean
+
+            for k in range(i):
+                outs = model.predict(embeddings[i], embeddings[k])
+                mean = np.mean(outs)
+
+                fp += mean
+                tn += 1 - mean
 
         tp /= nrof_positive_class_pairs
         fn /= nrof_positive_class_pairs
@@ -120,7 +110,6 @@ def main(model: Path):
     model = facerecognizer.FaceToFaceRecognizer(input_shape)
     model.summary()
 
-    nrof_epochs = 150
     epoch_size = 100
     optimizer = tf.keras.optimizers.Adam(epsilon=0.1)
 
@@ -128,6 +117,8 @@ def main(model: Path):
     schedule = DictConfig({'value': None,
                            'schedule': [[50, 0.01], [100, 0.001], [150, 0.0001]]
                            })
+    nrof_epochs = schedule.schedule[-1][0]
+
     learning_rate_scheduler = facenet.LearningRateScheduler(config=schedule)
 
     for epoch in range(nrof_epochs):

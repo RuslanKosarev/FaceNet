@@ -17,7 +17,7 @@ from facenet import config, facenet, facerecognizer, ioutils, h5utils
 
 
 class ConfusionMatrix:
-    def __init__(self, embeddings, model):
+    def __init__(self, embeddings, model, block2row=True):
         nrof_classes = len(embeddings)
         nrof_positive_class_pairs = nrof_classes
         nrof_negative_class_pairs = nrof_classes * (nrof_classes - 1) / 2
@@ -25,20 +25,23 @@ class ConfusionMatrix:
         tp = tn = fp = fn = 0
 
         for i in range(nrof_classes):
-            if i > 0:
-                row_embeddings = np.concatenate(embeddings[:i], axis=0)
-                outs = model.predict(row_embeddings, embeddings[i])
-                mean = np.mean(outs)
+            if block2row:
+                # evaluate confusion matrix block by row
+                if i > 0:
+                    row_embeddings = np.concatenate(embeddings[:i], axis=0)
+                    outs = model.predict(row_embeddings, embeddings[i])
+                    mean = np.mean(outs)
 
-                fp += mean * i
-                tn += (1 - mean) * i
+                    fp += mean * i
+                    tn += (1 - mean) * i
+            else:
+                # evaluate confusion matrix block by block
+                for k in range(i):
+                    outs = model.predict(embeddings[i], embeddings[k])
+                    mean = np.mean(outs)
 
-            # for k in range(i):
-            #     outs = model.predict(embeddings[i], embeddings[k])
-            #     mean = np.mean(outs)
-            #
-            #     fp += mean
-            #     tn += 1 - mean
+                    fp += mean
+                    tn += 1 - mean
 
             outs = model.predict(embeddings[i])
             mean = np.mean(outs)

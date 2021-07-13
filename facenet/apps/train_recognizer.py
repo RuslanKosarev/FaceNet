@@ -110,12 +110,12 @@ def main(model: Path):
     model = facerecognizer.FaceToFaceRecognizer(input_shape)
     model.summary()
 
-    epoch_size = 100
+    epoch_size = 1000
     optimizer = tf.keras.optimizers.Adam(epsilon=0.1)
 
     from omegaconf import DictConfig
     schedule = DictConfig({'value': None,
-                           'schedule': [[50, 0.01], [100, 0.001], [150, 0.0001]]
+                           'schedule': [[5, 0.01], [10, 0.001], [15, 0.0001]]
                            })
     nrof_epochs = schedule.schedule[-1][0]
 

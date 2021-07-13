@@ -122,7 +122,7 @@ def main(model: Path):
         grads = tape.gradient(loss_value, model.trainable_weights)
         optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
-        if epoch % 100 == 0 or epoch+1 == nrof_epochs:
+        if epoch % 100 == 0 or epoch == nrof_epochs:
             print(f'Training loss (for one batch) {epoch}: {loss_value}')
             print(model.alpha.numpy(), model.threshold.numpy())
 

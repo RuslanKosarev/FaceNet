@@ -44,7 +44,7 @@ class ConfusionMatrix:
         fp /= nrof_negative_class_pairs
         tn /= nrof_negative_class_pairs
 
-        self.classifier = classifier
+        self.classifier = type(classifier).__name__
         self.accuracy = (tp + tn) / (tp + fp + tn + fn)
         self.precision = tp / (tp + fp)
         self.tp_rate = tp / (tp + fn)
@@ -99,8 +99,8 @@ def main(model: Path):
 
     embeddings = facenet.split_embeddings(embeddings, labels)
 
-    options.recognizer.nrof_classes_per_batch = 16
-    options.recognizer.nrof_examples_per_class = 16
+    options.recognizer.nrof_classes_per_batch = 32
+    options.recognizer.nrof_examples_per_class = 32
     tf_train_dataset = facenet.equal_batches_input_pipeline(embeddings, options.recognizer)
 
     # define classifier
@@ -108,26 +108,25 @@ def main(model: Path):
     model = facerecognizer.FaceToFaceRecognizer(input_shape)
     model.summary()
 
-    epochs = 100
-    nrof_step = 100
+    nrof_epochs = 1000
+
     # optimizer = keras.optimizers.SGD(learning_rate=0.0001)
     optimizer = tf.keras.optimizers.Adam(epsilon=0.01)
 
-    for epoch in range(epochs):
-        for step, x_batch_train, in enumerate(tf_train_dataset):
-            if step > nrof_step:
-                break
+    for epoch, x_batch_train, in enumerate(tf_train_dataset):
+        if epoch >= nrof_epochs:
+            break
 
-            # Run the forward pass of the layer
-            with tf.GradientTape() as tape:
-                logits = model.call(x_batch_train)
-                loss_value = binary_cross_entropy_loss(logits, options.recognizer)
+        with tf.GradientTape() as tape:
+            logits = model(x_batch_train)   # noqa
+            loss_value = binary_cross_entropy_loss(logits, options.recognizer)
 
-            grads = tape.gradient(loss_value, model.trainable_weights)
-            optimizer.apply_gradients(zip(grads, model.trainable_weights))
+        grads = tape.gradient(loss_value, model.trainable_weights)
+        optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
-        print(f'Training loss (for one batch) at {epoch}: {loss_value}')
-        print(model.alpha.numpy(), model.threshold.numpy())
+        if epoch % 50 == 0:
+            print(f'Training loss (for one batch) {epoch}: {loss_value}')
+            print(model.alpha.numpy(), model.threshold.numpy())
 
     conf_mat = ConfusionMatrix(embeddings, model)
     print(conf_mat)

@@ -9,6 +9,7 @@ from tqdm import tqdm
 from pathlib import Path
 from loguru import logger
 from tensorflow import keras
+import itertools
 
 import tensorflow as tf
 import numpy as np
@@ -119,23 +120,29 @@ def main(model: Path):
     model = facerecognizer.FaceToFaceRecognizer(input_shape)
     model.summary()
 
-    nrof_epochs = 100
-    optimizer = tf.keras.optimizers.Adam(epsilon=0.1, learning_rate=0.001)
+    nrof_epochs = 150
+    epoch_size = 100
+    optimizer = tf.keras.optimizers.Adam(epsilon=0.1)
 
-    for epoch, x_batch_train, in enumerate(tf_train_dataset):
-        if epoch > nrof_epochs:
-            break
+    from omegaconf import DictConfig
+    schedule = DictConfig({'value': None,
+                           'schedule': [[50, 0.01], [100, 0.001], [150, 0.0001]]
+                           })
+    learning_rate_scheduler = facenet.LearningRateScheduler(config=schedule)
 
-        with tf.GradientTape() as tape:
-            logits = model(x_batch_train)   # noqa
-            loss_value = binary_cross_entropy_loss(logits, options.recognizer)
+    for epoch in range(nrof_epochs):
+        optimizer.lr.assign(learning_rate_scheduler(epoch))
 
-        grads = tape.gradient(loss_value, model.trainable_weights)
-        optimizer.apply_gradients(zip(grads, model.trainable_weights))
+        for step, x_batch_train, in zip(range(epoch_size), tf_train_dataset):
+            with tf.GradientTape() as tape:
+                logits = model(x_batch_train)   # noqa
+                loss_value = binary_cross_entropy_loss(logits, options.recognizer)
 
-        if epoch % 100 == 0 or epoch == nrof_epochs:
-            print(f'Training loss (for one batch) {epoch}: {loss_value}')
-            print(model.alpha.numpy(), model.threshold.numpy())
+            grads = tape.gradient(loss_value, model.trainable_weights)
+            optimizer.apply_gradients(zip(grads, model.trainable_weights))
+
+        print(f'Training loss (for one batch) {epoch}: {loss_value}')
+        print(model.alpha.numpy(), model.threshold.numpy())
 
     conf_mat = ConfusionMatrix(embeddings, model)
     print(conf_mat)

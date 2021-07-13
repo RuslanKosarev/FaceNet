@@ -142,7 +142,7 @@ class LearningRateScheduler:
         else:
             self.default_value = None
 
-    def __call__(self, epoch):
+    def __call__(self, epoch: int) -> float:
         if self.default_value is not None:
             return self.default_value
 

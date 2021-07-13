@@ -25,12 +25,20 @@ class ConfusionMatrix:
         tp = tn = fp = fn = 0
 
         for i in range(nrof_classes):
-            for k in range(i):
-                outs = model.predict(embeddings[i], embeddings[k])
+            if i > 0:
+                row_embeddings = np.concatenate(embeddings[:i], axis=0)
+                outs = model.predict(row_embeddings, embeddings[i])
                 mean = np.mean(outs)
 
-                fp += mean
-                tn += 1 - mean
+                fp += mean * i
+                tn += (1 - mean) * i
+
+            # for k in range(i):
+            #     outs = model.predict(embeddings[i], embeddings[k])
+            #     mean = np.mean(outs)
+            #
+            #     fp += mean
+            #     tn += 1 - mean
 
             outs = model.predict(embeddings[i])
             mean = np.mean(outs)

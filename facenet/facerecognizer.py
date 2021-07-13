@@ -105,4 +105,4 @@ class FaceToFaceRecognizer(keras.Model):
         return dist
 
     def predict(self, x, y=None):
-        return self.distance(x, y) < self.variable('threshold', mode='numpy')
+        return tf.less(self.distance(x, y), self.threshold)

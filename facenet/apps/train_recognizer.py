@@ -106,11 +106,12 @@ def main(path: Path):
     schedule = options.train.learning_rate
 
     learning_rate_scheduler = facenet.LearningRateScheduler(config=schedule)
+    max_nrof_epochs = options.train.epoch.max_nrof_epochs
 
-    for epoch in range(options.train.epoch.max_nrof_epochs):
+    for epoch in range(max_nrof_epochs):
         optimizer.lr.assign(learning_rate_scheduler(epoch))
 
-        for step, x_batch_train, in zip(range(options.train.epoch.max_nrof_epochs), tf_train_dataset):
+        for step, x_batch_train, in zip(range(options.train.epoch.size), tf_train_dataset):
             with tf.GradientTape() as tape:
                 logits = model(x_batch_train)   # noqa
                 loss_value = binary_cross_entropy_loss(logits, options.train)
@@ -118,11 +119,16 @@ def main(path: Path):
             grads = tape.gradient(loss_value, model.trainable_weights)
             optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
-        logger.info('[{epoch}] Training loss (for one batch) {loss_value}', epoch=epoch, loss_value=loss_value)
+        logger.info(
+            'epoch [{epoch}/{max_nrof_epochs}] training loss {loss_value}',
+            epoch=epoch,
+            max_nrof_epochs=max_nrof_epochs,
+            loss_value=loss_value
+        )
         logger.info('variables {model}', model=model)
 
-        conf_mat = ConfusionMatrix(embeddings, model)
-        logger.info('ConfusionMatrix \n {conf_mat}', conf_mat=conf_mat)
+    conf_mat = ConfusionMatrix(embeddings, model)
+    logger.info('ConfusionMatrix \n {conf_mat}', conf_mat=conf_mat)
 
 
 if __name__ == '__main__':

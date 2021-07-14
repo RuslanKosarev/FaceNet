@@ -185,7 +185,7 @@ def train_classifier(options):
     ioutils.write_arguments(cfg, cfg.logs.dir)
     ioutils.store_revision_info(cfg.logs.dir)
 
-    logging.configure_logging(cfg.logs)
+    logging.configure_logging(options.outdir)
 
     return cfg
 
@@ -200,13 +200,12 @@ def train_recognizer(path: PathType):
 
     if not options.outdir:
         options.outdir = Path(options.model.path).expanduser() / 'recognition' / subdir()
-        options.logfile = options.outdir / 'log.txt'
 
     # write arguments and some git revision info
     ioutils.write_arguments(options.outdir, options)
     ioutils.store_revision_info(options.outdir)
 
-    logging.configure_logging(options.logfile)
+    logging.configure_logging(options.outdir)
 
     return options
 
@@ -223,13 +222,12 @@ def evaluate_embeddings(options):
         options.outdir = Path(outdir).expanduser() / Path(options.dataset.path).stem
 
     options.h5file = options.outdir / 'embeddings.h5'
-    options.logfile = options.outdir / 'log.txt'
 
     # write arguments and some git revision info
     ioutils.write_arguments(options.outdir, options)
     ioutils.store_revision_info(options.outdir)
 
-    logging.configure_logging(options.logfile)
+    logging.configure_logging(options.outdir)
 
     return options
 

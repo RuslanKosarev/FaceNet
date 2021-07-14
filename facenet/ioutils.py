@@ -20,30 +20,7 @@ PathType = Union[Path, str]
 makedirs = partial(Path.mkdir, parents=True, exist_ok=True)
 
 
-def end(start, stop):
-    return '\n' if (start+1) == stop else ''
-
-
-def get_time():
-    return time.monotonic()
-
-
-def write_elapsed_time(files, start_time):
-    if not isinstance(files, list):
-        files = [files]
-
-    for file in files:
-        file = Path(file).expanduser()
-        elapsed_time = (time.monotonic() - start_time)/60
-
-        if file.suffix == '.h5':
-            h5utils.write(file, 'elapsed_time', elapsed_time)
-        else:
-            with file.open('at') as f:
-                f.write('elapsed time: {:.3f}\n'.format(elapsed_time))
-
-
-def store_revision_info(output_filename, mode='w'):
+def write_revision_info(output_filename, mode='w'):
     output_filename = Path(output_filename)
 
     if output_filename.is_dir():
@@ -97,7 +74,7 @@ def git_diff():
     return info
 
 
-def write_arguments(path: PathType, cfg, mode: str='w'):
+def write_arguments(path: PathType, cfg, mode: str = 'w'):
     path = Path(path).expanduser()
     name = Path(sys.argv[0]).stem + '.yaml'
 
@@ -167,7 +144,8 @@ class ImageLoader:
         if self.counter < self.size:
             if (self.counter + 1) % self.display == 0:
                 elapsed_time = (time.time() - self.start_time) / self.display
-                print('\rnumber of processed images {}/{}, {:.5f} seconds per image'.format(self.counter+1, self.size, elapsed_time), end='')
+                print('\rnumber of processed images {}/{}, {:.5f} seconds per image'.format(self.counter + 1, self.size,
+                                                                                            elapsed_time), end='')
                 self.start_time = time.time()
 
             image = read_image(self.files[self.counter], prefix=self.prefix)
@@ -192,7 +170,6 @@ def pil2array(image, mode='RGB'):
 
 
 def array2pil(image, mode='RGB'):
-
     default_mode = 'RGB'
     index = []
 

@@ -183,7 +183,7 @@ def train_classifier(options):
 
     # write arguments and some git revision info
     ioutils.write_arguments(cfg, cfg.logs.dir)
-    ioutils.store_revision_info(cfg.logs.dir)
+    ioutils.write_revision_info(cfg.logs.dir)
 
     logging.configure_logging(options.outdir)
 
@@ -203,7 +203,7 @@ def train_recognizer(path: PathType):
 
     # write arguments and some git revision info
     ioutils.write_arguments(options.outdir, options)
-    ioutils.store_revision_info(options.outdir)
+    ioutils.write_revision_info(options.outdir)
 
     logging.configure_logging(options.outdir)
 
@@ -225,7 +225,7 @@ def evaluate_embeddings(options):
 
     # write arguments and some git revision info
     ioutils.write_arguments(options.outdir, options)
-    ioutils.store_revision_info(options.outdir)
+    ioutils.write_revision_info(options.outdir)
 
     logging.configure_logging(options.outdir)
 

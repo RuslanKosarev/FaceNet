@@ -22,6 +22,7 @@ class ImageLoader:
     def __call__(self, path):
         contents = tf.io.read_file(path)
         image = tf.image.decode_image(contents, channels=3)
+        # TODO
         image = tf.image.resize_with_crop_or_pad(image, self.height, self.width)
         return image
 

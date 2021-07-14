@@ -82,10 +82,18 @@ class FaceToFaceRecognizer(keras.Model):
         super().__init__()
         prefix = type(self).__name__
 
-        self.alpha = tf.Variable(1, name=f'{prefix}/alpha', trainable=True, dtype=tf.float32)
+        self.alpha = tf.Variable(10, name=f'{prefix}/alpha', trainable=True, dtype=tf.float32)
         self.threshold = tf.Variable(1, name=f'{prefix}/threshold', trainable=True, dtype=tf.float32)
 
         self(input_shape) # noqa
+
+    def __repr__(self):
+        info = f'{type(self).__name__}\n'
+
+        for variable in self.trainable_weights:
+            info += f'{variable.name}: {variable.numpy()}\n'
+
+        return info
 
     def call(self, x, y=None):
         logits = tf.multiply(self.alpha, tf.subtract(self.threshold, self.distance(x, y)))
@@ -95,10 +103,10 @@ class FaceToFaceRecognizer(keras.Model):
     def distance(x, y=None):
         x = tf.nn.l2_normalize(x, axis=1)
 
-        if y is not None:
-            y = tf.nn.l2_normalize(y, axis=1)
-        else:
+        if y is None:
             y = x
+        else:
+            y = tf.nn.l2_normalize(y, axis=1)
 
         dist = 2 * (1 - x @ tf.transpose(y))
 

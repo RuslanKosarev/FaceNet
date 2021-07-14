@@ -20,6 +20,8 @@ def main(options: Path):
 
     options = config.train_classifier(options)
 
+    return
+
     # ------------------------------------------------------------------------------------------------------------------
     # define train and test datasets
     loader = facenet.ImageLoader(config=options.image)

@@ -112,7 +112,7 @@ def evaluate_embeddings(model, tf_dataset):
     return np.concatenate(embeddings), np.concatenate(labels)
 
 
-def split_embeddings(embeddings: np.array, labels: np.array) -> List[np.array]:
+def split_embeddings(embeddings: np.ndarray, labels: np.ndarray) -> List[np.ndarray]:
     """
     Split input 2D array of embeddings into list of embeddings, each element of list corresponds unique class
 

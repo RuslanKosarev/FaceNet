@@ -38,7 +38,7 @@ train:
 test:
   dataset:
     # Path to the directory with aligned face images to train facenet.
-    path: ~/datasets/megaface/megaface_frcnnv3extracted_160
+    path: ~/datasets/megaface/megaface_extracted_160
     # Number of classes to download from data set
     nrof_classes:
     # Minimal number of images per class to download from class

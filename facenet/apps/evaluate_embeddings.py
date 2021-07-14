@@ -33,7 +33,7 @@ def main(options: Path):
     h5utils.write(options.h5file, 'labels', labels)
 
     logger.info('Output h5 file: {file}', file=options.h5file)
-    logger.info('Number of embeddings: {count}', count=embeddings.shape[0])
+    logger.info('Shape of embeddings: {shape}', shape=embeddings.shape)
 
 
 if __name__ == '__main__':

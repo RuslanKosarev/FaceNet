@@ -199,7 +199,7 @@ def train_recognizer(path: PathType):
         options.train.epoch.max_nrof_epochs = options.train.learning_rate.schedule[-1][0]
 
     if not options.outdir:
-        options.outdir = Path(options.model.path).expanduser() / 'recognizer' / subdir()
+        options.outdir = Path(options.model.path).expanduser() / 'recognition' / subdir()
         options.logfile = options.outdir / 'log.txt'
 
     # write arguments and some git revision info
@@ -217,7 +217,11 @@ def evaluate_embeddings(options):
     set_seed(options.seed)
 
     options.model.path = Path(options.model.path).expanduser()
-    options.outdir = Path(options.dataset.path + '_' + options.model.path.stem).expanduser()
+
+    if not options.outdir:
+        outdir = options.model.path
+        options.outdir = Path(outdir).expanduser() / Path(options.dataset.path).stem
+
     options.h5file = options.outdir / 'embeddings.h5'
     options.logfile = options.outdir / 'log.txt'
 

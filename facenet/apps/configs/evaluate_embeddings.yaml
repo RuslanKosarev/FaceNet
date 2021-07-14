@@ -1,8 +1,12 @@
 # coding:utf-8
 
+model:
+  # Path to directory containing the trained model
+  path:
+
 dataset:
   # Path to the directory with aligned face images to train facenet.
-  path: ~/datasets/vggface2/test_extracted_160
+  path: ~/datasets/megaface/megaface_extracted_160
   # Number of classes to download from data set
   nrof_classes:
   # Minimal number of images per class to download from class
@@ -10,10 +14,5 @@ dataset:
   # Maximal number of images per class to download from class
   max_nrof_images:
 
-model:
-  # Path to directory containing the meta_file and ckpt_file or a model protobuf (.pb) file, if
-  # path is not defined default_model_path from config.py will be used
-  path:
-  # If true embeddings will be normalized to 1
-  normalization: false
 
+outdir:

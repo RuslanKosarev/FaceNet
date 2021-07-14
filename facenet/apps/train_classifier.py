@@ -1,10 +1,6 @@
 # coding:utf-8
 """Training a face recognizer with TensorFlow using softmax cross entropy loss
 """
-# MIT License
-# 
-# Copyright (c) 2020 sMedX
-# 
 
 import click
 from pathlib import Path
@@ -19,7 +15,7 @@ from facenet.dataset import Database
 
 @click.command()
 @click.option('--config', default=None, type=Path,
-              help='Path to yaml config file with used options of the application.')
+              help='Path to yaml config file with used options for the application.')
 def main(**options):
 
     cfg = config.train_classifier(options)

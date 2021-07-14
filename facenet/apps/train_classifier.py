@@ -14,33 +14,33 @@ from facenet.dataset import Database
 
 
 @click.command()
-@click.option('--config', default=None, type=Path,
+@click.option('--config', type=Path, default=None,
               help='Path to yaml config file with used options for the application.')
-def main(**options):
+def main(options: Path):
 
-    cfg = config.train_classifier(options)
+    options = config.train_classifier(options)
 
     # ------------------------------------------------------------------------------------------------------------------
     # define train and test datasets
-    loader = facenet.ImageLoader(config=cfg.image)
+    loader = facenet.ImageLoader(config=options.image)
 
-    train_dataset = Database(cfg.train.dataset)
+    train_dataset = Database(options.train.dataset)
     tf_train_dataset = train_dataset.tf_dataset_api(loader=loader,
-                                                    batch_size=cfg.batch_size,
+                                                    batch_size=options.batch_size,
                                                     repeat=True,
                                                     buffer_size=10)
 
-    test_dataset = Database(cfg.test.dataset)
+    test_dataset = Database(options.test.dataset)
     tf_test_dataset = test_dataset.tf_dataset_api(loader=loader,
-                                                  batch_size=cfg.batch_size,
+                                                  batch_size=options.batch_size,
                                                   repeat=False,
                                                   buffer_size=None)
 
     # ------------------------------------------------------------------------------------------------------------------
     # define network to train
     model = FaceNet(
-        input_shape=facenet.inputs(cfg.image),
-        image_processing=facenet.ImageProcessing(cfg.image)
+        input_shape=facenet.inputs(options.image),
+        image_processing=facenet.ImageProcessing(options.image)
     )
     model.summary()
 
@@ -59,31 +59,31 @@ def main(**options):
         )
     ])
 
-    network(facenet.inputs(cfg.image))
+    network(facenet.inputs(options.image))
 
-    if cfg.model.checkpoint:
-        checkpoint = cfg.model.checkpoint / cfg.model.checkpoint.stem
+    if options.model.checkpoint:
+        checkpoint = options.model.checkpoint / options.model.checkpoint.stem
         logger.info('Restore checkpoint %s', checkpoint)
         network.load_weights(checkpoint)
 
     # ------------------------------------------------------------------------------------------------------------------
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath=cfg.model.path / cfg.model.path.stem,
+        filepath=options.model.path / options.model.path.stem,
         save_weights_only=True,
         verbose=True
     )
 
     learning_rate_callback = tf.keras.callbacks.LearningRateScheduler(
-        facenet.LearningRateScheduler(config=cfg.train.learning_rate),
+        facenet.LearningRateScheduler(config=options.train.learning_rate),
         verbose=True
     )
 
     validate_callbacks = callbacks.ValidateCallback(
         model,
         tf_test_dataset,
-        every_n_epochs=cfg.validate.every_n_epochs,
-        max_nrof_epochs=cfg.train.epoch.max_nrof_epochs,
-        config=cfg.validate
+        every_n_epochs=options.validate.every_n_epochs,
+        max_nrof_epochs=options.train.epoch.max_nrof_epochs,
+        config=options.validate
     )
 
     network.compile(
@@ -93,17 +93,18 @@ def main(**options):
 
     network.fit(
         tf_train_dataset,
-        epochs=cfg.train.epoch.max_nrof_epochs,
-        steps_per_epoch=cfg.train.epoch.size,
+        epochs=options.train.epoch.max_nrof_epochs,
+        steps_per_epoch=options.train.epoch.size,
         callbacks=[
             checkpoint_callback,
             learning_rate_callback,
             validate_callbacks,
         ]
     )
-    network.save(cfg.model.path)
 
-    logger.info('Model and logs have been saved to the directory %s', cfg.model.path)
+    network.save(options.model.path)
+
+    logger.info('Model and logs have been saved to the directory %s', options.model.path)
 
 
 if __name__ == '__main__':

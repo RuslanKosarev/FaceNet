@@ -1,23 +1,20 @@
-"""Train facenet classifier.
+"""Train facenet recognizer.
 """
-# MIT License
-#
-# Copyright (c) 2020 SMedX
 
 import click
-from tqdm import tqdm
 from pathlib import Path
 from loguru import logger
-from tensorflow import keras
-import itertools
 
 import tensorflow as tf
 import numpy as np
 
-from facenet import config, facenet, facerecognizer, ioutils, h5utils
+from facenet import config, facenet, facerecognizer, h5utils
 
 
 class ConfusionMatrix:
+    """
+    Evaluate confusion matrix block by block for given model and embeddings
+    """
     def __init__(self, embeddings, model):
         nrof_classes = len(embeddings)
         nrof_positive_class_pairs = nrof_classes
@@ -46,7 +43,6 @@ class ConfusionMatrix:
         fp /= nrof_negative_class_pairs
         tn /= nrof_negative_class_pairs
 
-        self.model = type(model).__name__
         self.accuracy = (tp + tn) / (tp + fp + tn + fn)
         self.precision = tp / (tp + fp)
         self.tp_rate = tp / (tp + fn)
@@ -54,7 +50,6 @@ class ConfusionMatrix:
 
     def __repr__(self):
         return (f'{type(self).__name__}\n' +
-                f'{str(self.model)}\n' +
                 f'accuracy  {self.accuracy}\n' +
                 f'precision {self.precision}\n' +
                 f'tp rate   {self.tp_rate}\n' +
@@ -89,54 +84,45 @@ def binary_cross_entropy_loss(logits, cfg):
 
 
 @click.command()
-@click.option('-m', '--model', type=Path, required=True,
-              help='Path to directory with saved model.')
-def main(model: Path):
+@click.option('--path', type=Path, default=None,
+              help='Path to yaml config file with used options for the application.')
+def main(path: Path):
 
-    options = config.train_recognizer(model)
+    options = config.train_recognizer(path)
 
-    h5file = list(model.glob('*.h5'))[0]
-    embeddings = h5utils.read(h5file, 'embeddings')
-    labels = h5utils.read(h5file, 'labels')
+    embeddings = h5utils.read(options.embeddings.path, 'embeddings')
+    labels = h5utils.read(options.embeddings.path, 'labels')
 
     embeddings = facenet.split_embeddings(embeddings, labels)
 
-    options.recognizer.nrof_classes_per_batch = 8
-    options.recognizer.nrof_examples_per_class = 8
-    tf_train_dataset = facenet.equal_batches_input_pipeline(embeddings, options.recognizer)
+    tf_train_dataset = facenet.equal_batches_input_pipeline(embeddings, options.train)
 
-    # define classifier
+    # initialize classifier
     input_shape = tf.keras.Input([embeddings[0].shape[1]])
     model = facerecognizer.FaceToFaceRecognizer(input_shape)
     model.summary()
 
-    epoch_size = 1000
     optimizer = tf.keras.optimizers.Adam(epsilon=0.1)
-
-    from omegaconf import DictConfig
-    schedule = DictConfig({'value': None,
-                           'schedule': [[5, 0.01], [10, 0.001], [15, 0.0001]]
-                           })
-    nrof_epochs = schedule.schedule[-1][0]
+    schedule = options.train.learning_rate
 
     learning_rate_scheduler = facenet.LearningRateScheduler(config=schedule)
 
-    for epoch in range(nrof_epochs):
+    for epoch in range(options.train.epoch.max_nrof_epochs):
         optimizer.lr.assign(learning_rate_scheduler(epoch))
 
-        for step, x_batch_train, in zip(range(epoch_size), tf_train_dataset):
+        for step, x_batch_train, in zip(range(options.train.epoch.max_nrof_epochs), tf_train_dataset):
             with tf.GradientTape() as tape:
                 logits = model(x_batch_train)   # noqa
-                loss_value = binary_cross_entropy_loss(logits, options.recognizer)
+                loss_value = binary_cross_entropy_loss(logits, options.train)
 
             grads = tape.gradient(loss_value, model.trainable_weights)
             optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
-        print(f'Training loss (for one batch) {epoch}: {loss_value}')
-        print(model.alpha.numpy(), model.threshold.numpy())
+        logger.info('[{epoch}] Training loss (for one batch) {loss_value}', epoch=epoch, loss_value=loss_value)
+        logger.info('variables {model}', model=model)
 
         conf_mat = ConfusionMatrix(embeddings, model)
-        print(conf_mat)
+        logger.info('ConfusionMatrix \n {conf_mat}', conf_mat=conf_mat)
 
 
 if __name__ == '__main__':

@@ -68,13 +68,6 @@ def equal_batches_input_pipeline(embeddings, config):
     :param config: 
     :return: 
     """""
-    # if not config.nrof_classes_per_batch:
-    #     config.nrof_classes_per_batch = len(embeddings)
-    #
-    # if not config.nrof_examples_per_class:
-    #     config.nrof_examples_per_class = round(0.1*sum([len(embs) for embs in embeddings]) / len(embeddings))
-    #     config.nrof_examples_per_class = max(config.nrof_examples_per_class, 1)
-
     logger.info('Building equal batches input pipeline.')
     logger.info('Number of classes per batch: {nrof_classes}', nrof_classes=config.nrof_classes_per_batch)
     logger.info('Number of examples per class: {nrof_examples}', nrof_examples=config.nrof_examples_per_class)
@@ -128,9 +121,7 @@ def split_embeddings(embeddings: np.array, labels: np.array) -> List[np.array]:
     :return:
     """
 
-    embeddings = [embeddings[label == labels] for label in np.unique(labels)]
-
-    return embeddings
+    return [embeddings[label == labels] for label in np.unique(labels)]
 
 
 class LearningRateScheduler:

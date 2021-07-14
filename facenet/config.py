@@ -1,6 +1,7 @@
 # coding: utf-8
 __author__ = 'Ruslan N. Kosarev'
 
+import sys
 from typing import Union
 from pathlib import Path
 from datetime import datetime
@@ -27,14 +28,19 @@ default_model_path = Path(__file__).parents[1] / 'models/default'
 user_config = user_config_dir / 'config.yaml'
 default_train_config = default_config_dir / 'train_config.yaml'
 default_evaluate_embeddings_config = default_config_dir / 'evaluate_embeddings.yaml'
+default_train_recognizer_config = default_config_dir / 'train_recognizer_config.yaml'
 
 
 def subdir() -> str:
     return datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S')
 
 
+def application_name():
+    return Path(sys.argv[0]).stem
+
+
 def config_paths(app_file_name, custom_config_file=None):
-    config_name = Path(app_file_name).stem + '.yaml'
+    config_name = Path(app_file_name).stem + '_config.yaml'
 
     paths = [
         default_config,
@@ -153,7 +159,7 @@ def load_config(app_file_name, file=None):
 
 
 def train_classifier(options):
-    cfg = load_config(default_train_classifier_config, options)
+    cfg = load_config(application_name(), options)
 
     set_seed(cfg.seed)
 
@@ -185,12 +191,16 @@ def train_classifier(options):
 
 
 def train_recognizer(path: PathType):
-    options = load_config(default_train_config, path)
+    options = load_config(application_name(), path)
 
     set_seed(options.seed)
 
-    options.outdir = path / 'recognizer' / subdir()
-    options.logfile = options.outdir / 'log.txt'
+    if not options.train.epoch.max_nrof_epochs:
+        options.train.epoch.max_nrof_epochs = options.train.learning_rate.schedule[-1][0]
+
+    if not options.outdir:
+        options.outdir = Path(options.model.path).expanduser() / 'recognizer' / subdir()
+        options.logfile = options.outdir / 'log.txt'
 
     # write arguments and some git revision info
     ioutils.write_arguments(options.outdir, options)
@@ -202,7 +212,7 @@ def train_recognizer(path: PathType):
 
 
 def evaluate_embeddings(options):
-    options = load_config(default_evaluate_embeddings_config, options)
+    options = load_config(application_name(), options)
 
     set_seed(options.seed)
 

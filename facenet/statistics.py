@@ -1,8 +1,3 @@
-"""Performs processing images."""
-# MIT License
-#
-# Copyright (c) 2019 Ruslan N. Kosarev
-
 from tqdm import tqdm
 
 import time
@@ -15,8 +10,7 @@ from sklearn.model_selection import KFold
 from scipy import interpolate
 from scipy.optimize import brentq
 from pathlib import Path
-
-from facenet import ioutils, h5utils
+from facenet import facenet
 
 
 def pairwise_similarities(xa, xb=None, metric=0, atol=1.e-5):
@@ -65,27 +59,13 @@ def std(x):
     return np.std(np.array(x))
 
 
-def split_embeddings(embeddings, labels):
-    """
-    split embeddings to structure [[], [], ...[]]
-    :param embeddings:
-    :param labels:
-    :return:
-    """
-    emb_list = []
-    for label in np.unique(labels):
-        emb_array = embeddings[label == labels]
-        emb_list.append(emb_array)
-    return emb_list
-
-
 class SimilarityCalculator:
     """
     Class to evaluate similarities according to defined metric
     """
     def __init__(self, embeddings, labels, metric=0):
         self.metric = metric
-        self.embeddings = split_embeddings(embeddings, labels)
+        self.embeddings = facenet.split_embeddings(embeddings, labels)
 
     def evaluate(self, i, k):
         nrof_positive_class_pairs = self.nrof_classes

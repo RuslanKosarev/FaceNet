@@ -38,7 +38,8 @@ class ImageProcessing(tf.keras.layers.Layer):
     def call(self, image_batch, **kwargs):
         image_batch = tf.identity(image_batch, name='image')
         image_batch = tf.cast(image_batch, dtype=tf.float32, name='float_image')
-        image_batch = tf.image.resize(image_batch, size=self.image_size, name='resized_image')
+        # TODO
+        # image_batch = tf.image.resize(image_batch, size=self.image_size, name='resized_image')
 
         if self.config.normalization == 0:
             min_value = tf.math.reduce_min(image_batch, axis=[-1, -2, -3], keepdims=True)

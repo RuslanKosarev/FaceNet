@@ -30,8 +30,6 @@ validate:
   dataset:
     # Path to the directory with aligned face images to validate facenet.
     path: ~/datasets/megaface/megaface_extracted_160
-    # Path to h5 file with information about valid images
-    h5file:
     # Number of classes to download from data set
     nrof_classes:
     # Minimal number of images per class to download from class

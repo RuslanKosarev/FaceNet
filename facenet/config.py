@@ -167,12 +167,8 @@ def train_classifier(path: PathType):
 
     set_seed(options.seed)
 
-    path = Path(options.model.path).expanduser()
-    options.model.path = path / subdir()
-
-    options.logs = Config()
-    options.logs.dir = options.model.path / 'logs'
-    options.logs.file = options.model.path.stem + '.log'
+    options.outdir = Path(options.model.path).expanduser() / subdir()
+    options.logdir = options.outdir / 'log'
 
     if options.model.checkpoint:
         options.model.checkpoint = Path(options.model.checkpoint).expanduser()
@@ -186,10 +182,10 @@ def train_classifier(path: PathType):
         options.validate.image.standardization = options.image.standardization
 
     # write arguments and some git revision info
-    ioutils.write_arguments(options, options.logs.dir)
-    ioutils.write_revision_info(options.logs.dir)
+    ioutils.write_arguments(options.logdir, options)
+    ioutils.write_revision_info(options.logdir)
 
-    logging.configure_logging(options.outdir)
+    logging.configure_logging(options.logdir)
 
     return options
 

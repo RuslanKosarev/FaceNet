@@ -1,18 +1,5 @@
 # coding:utf-8
 
-image:
-  # Image size (height, width) in pixels.
-  size: 160
-  # Performs normalization of images
-  normalization: 0
-  # Performs random cropping of training images. If false, the center image_size pixels from
-  # the training images are used. If the size of the images in the data directory is equal to image_size no cropping is performed.
-  random_crop: false
-  # Performs random horizontal flipping of training images
-  random_flip: false
-  # Performs random rotations of training images
-  random_rotate: false
-
 train:
   dataset:
     # Path to the directory with aligned face images to train facenet.
@@ -23,15 +10,6 @@ train:
     min_nrof_images:
     # Maximal number of images per class to download from class
     max_nrof_images:
-
-  # Model definition
-  model:
-    # Module containing the definition of the inference graph
-    module: facenet.models.inception_resnet_v1
-    # Load a pretrained checkpoint before training starts.
-    checkpoint:
-    # Directory where to write trained models and checkpoints
-    path:
 
   # Number of batches per epoch.
   epoch:
@@ -48,28 +26,21 @@ train:
     schedule: [[50, 0.05], [100, 0.005], [150, 0.0005]]
 
 ## Config for validation
-#validate:
-#  # Number of epoch between validation
-#  every_n_epochs: 10
-#
-#  dataset:
-#    # Path to the directory with aligned face images to validate facenet.
-#    path: ~/datasets/vggface2/test_extracted_160
-#    # Path to h5 file with information about valid images
-#    h5file:
-#    # Number of classes to download from data set
-#    nrof_classes:
-#    # Minimal number of images per class to download from class
-#    min_nrof_images:
-#    # Maximal number of images per class to download from class
-#    max_nrof_images: 50
-#
-#  validate:
-#    # Distance metric  0: euclidean, 1: cosine similarity
-#    metric: 0
-#    # Number of folds to use for cross validation. Mainly used for testing
-#    nrof_folds: 10
-#    # Target false alarm rate (face pairs that was incorrectly classified as the same)
-#    far_target: 0.001
-#
-#gpu_memory_fraction: 1.0        # Upper bound on the amount of GPU memory that will be used by the process
+validate:
+  dataset:
+    # Path to the directory with aligned face images to validate facenet.
+    path: ~/datasets/megaface/megaface_extracted_160
+    # Path to h5 file with information about valid images
+    h5file:
+    # Number of classes to download from data set
+    nrof_classes:
+    # Minimal number of images per class to download from class
+    min_nrof_images:
+    # Maximal number of images per class to download from class
+    max_nrof_images:
+
+  # Number of folds to use for cross validation. Mainly used for testing
+  nrof_folds: 10
+
+  # Target false alarm rate (face pairs that was incorrectly classified as the same)
+  far_target: 0.001

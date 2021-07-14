@@ -35,18 +35,7 @@ def pairwise_similarities(xa, xb=None, metric=0, atol=1.e-5):
         if sims.min() < -lim or sims.max() > lim:
             raise ValueError('\nembeddings must be normalized to 1, range {} {}'.format(sims.min(), sims.max()))
 
-        # to avoid warnings in np.arccos()
-        sims[sims < -1] = -1
-        sims[sims > +1] = +1
-
-        if metric == 0:
-            # squared Euclidean distance
-            sims = 2 * (1 - sims)
-        elif metric == 1:
-            # cosine
-            sims = np.arccos(sims)
-        else:
-            raise ValueError('Undefined similarity metric {}'.format(metric))
+        sims = 2 * (1 - sims)
 
     return sims
 
@@ -63,6 +52,7 @@ class SimilarityCalculator:
     """
     Class to evaluate similarities according to defined metric
     """
+
     def __init__(self, embeddings, labels, metric=0):
         self.metric = metric
         self.embeddings = facenet.split_embeddings(embeddings, labels)
@@ -92,6 +82,7 @@ class ConfidenceMatrix:
     """
     Class to evaluate confidence matrix (tp, tn, fp, fn) and others metrics
     """
+
     def __init__(self, calculator, threshold):
 
         self.threshold = np.array(threshold, ndmin=1)
@@ -102,7 +93,7 @@ class ConfidenceMatrix:
         self.fn = np.zeros(self.threshold.size)
 
         for i in range(calculator.nrof_classes):
-            for k in range(i+1):
+            for k in range(i + 1):
                 sims, weight = calculator.evaluate(i, k)
                 if sims.size < 1:
                     continue
@@ -111,11 +102,11 @@ class ConfidenceMatrix:
                     count = np.count_nonzero(sims < threshold)
 
                     if i == k:
-                        self.tp[n] += count/weight
-                        self.fn[n] += (sims.size - count)/weight
+                        self.tp[n] += count / weight
+                        self.fn[n] += (sims.size - count) / weight
                     else:
-                        self.fp[n] += count/weight
-                        self.tn[n] += (sims.size - count)/weight
+                        self.fp[n] += count / weight
+                        self.tn[n] += (sims.size - count) / weight
 
     @property
     def accuracy(self):
@@ -159,6 +150,7 @@ class Report:
     """
     Class to generate statistical report
     """
+
     def __init__(self, criterion=None):
         self.criterion = criterion
         self.conf_matrix_train = []
@@ -175,8 +167,10 @@ class Report:
 
         info += ('Accuracy:  {:2.5f}+-{:2.5f}\n'.format(dct['accuracy'], dct['accuracy_std']) +
                  'Precision: {:2.5f}+-{:2.5f}\n'.format(dct['precision'], std(dct['precision_std'])) +
-                 'Sensitivity (TPR, 1-a type 1 error): {:2.5f}+-{:2.5f}\n'.format(dct['tp_rates'], dct['tp_rates_std']) +
-                 'Specificity (TNR, 1-b type 2 error): {:2.5f}+-{:2.5f}\n'.format(dct['tn_rates'], dct['tn_rates_std']) +
+                 'Sensitivity (TPR, 1-a type 1 error): {:2.5f}+-{:2.5f}\n'.format(dct['tp_rates'],
+                                                                                  dct['tp_rates_std']) +
+                 'Specificity (TNR, 1-b type 2 error): {:2.5f}+-{:2.5f}\n'.format(dct['tn_rates'],
+                                                                                  dct['tn_rates_std']) +
                  'Threshold: {:2.5f}+-{:2.5f}\n'.format(dct['threshold'], dct['threshold_std']) + '\n'
                  )
         return info
@@ -218,28 +212,21 @@ class FaceToFaceValidation:
     """
     Class to perform face-to-face validation
     """
+
     def __init__(self, embeddings, labels, config):
         """
         :param embeddings:
         :param labels:
+        :param config:
         """
-        self.elapsed_time = time.monotonic()
-        self.embeddings = embeddings
-        self.labels = labels
 
-        assert (embeddings.shape[0] == len(labels))
+        self.elapsed_time = time.monotonic()
+        self.embeddings = embeddings / np.linalg.norm(embeddings, axis=1, keepdims=True)
+        self.labels = labels
 
         self.config = config
         self.reports = None
-
-        if self.config.metric == 0:
-            upper_threshold = 4
-        elif self.config.metric == 1:
-            upper_threshold = np.pi
-        else:
-            raise ValueError('Undefined similarity metric {}'.format(self.config.metric))
-
-        self.thresholds = np.linspace(0, upper_threshold, 100)
+        self.thresholds = np.linspace(0, 4, 101)
 
         self._evaluate()
 
@@ -266,7 +253,8 @@ class FaceToFaceValidation:
         with tqdm(total=k_fold.n_splits) as bar:
             for fold_idx, (train_set, test_set) in enumerate(k_fold.split(indices)):
                 # evaluations with train set and define the best threshold for the fold
-                calculator = SimilarityCalculator(self.embeddings[train_set], self.labels[train_set], metric=self.config.metric)
+                calculator = SimilarityCalculator(self.embeddings[train_set], self.labels[train_set],
+                                                  metric=self.config.metric)
 
                 matrix = ConfidenceMatrix(calculator, self.thresholds)
                 for i in range(len(self.reports)):
@@ -282,7 +270,8 @@ class FaceToFaceValidation:
                     far_threshold = f(self.config.far_target)
 
                 # evaluations with test set
-                calculator = SimilarityCalculator(self.embeddings[test_set], self.labels[test_set], metric=self.config.metric)
+                calculator = SimilarityCalculator(self.embeddings[test_set], self.labels[test_set],
+                                                  metric=self.config.metric)
 
                 self.reports[0].append_fold('test', ConfidenceMatrix(calculator, accuracy_threshold))
                 self.reports[1].append_fold('test', ConfidenceMatrix(calculator, far_threshold))

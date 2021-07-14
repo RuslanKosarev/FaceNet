@@ -25,19 +25,22 @@ def main(path: Path):
     loader = facenet.ImageLoader(config=options.image)
 
     train_dataset = Database(options.train.dataset)
-    tf_train_dataset = train_dataset.tf_dataset_api(loader=loader,
-                                                    batch_size=options.batch_size,
-                                                    repeat=True,
-                                                    buffer_size=10)
+    tf_train_dataset = train_dataset.tf_dataset_api(
+        loader=loader,
+        batch_size=options.batch_size,
+        repeat=True,
+        buffer_size=10
+    )
 
-    test_dataset = Database(options.test.dataset)
-    tf_test_dataset = test_dataset.tf_dataset_api(loader=loader,
-                                                  batch_size=options.batch_size,
-                                                  repeat=False,
-                                                  buffer_size=None)
-
+    test_dataset = Database(options.validate.dataset)
+    tf_validate_dataset = test_dataset.tf_dataset_api(
+        loader=loader,
+        batch_size=options.batch_size,
+        repeat=False,
+        buffer_size=None
+    )
     # ------------------------------------------------------------------------------------------------------------------
-    # define network to train
+    # initialize network
     model = FaceNet(
         input_shape=facenet.inputs(options.image),
         image_processing=facenet.ImageProcessing(options.image)
@@ -62,13 +65,13 @@ def main(path: Path):
     network(facenet.inputs(options.image))
 
     if options.model.checkpoint:
-        checkpoint = options.model.checkpoint / options.model.checkpoint.stem
+        checkpoint = Path(options.model.checkpoint).expanduser() / options.model.checkpoint.stem
         logger.info('Restore checkpoint %s', checkpoint)
         network.load_weights(checkpoint)
 
     # ------------------------------------------------------------------------------------------------------------------
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath=options.model.path / options.model.path.stem,
+        filepath=options.outdir / options.outdir.stem,
         save_weights_only=True,
         verbose=True
     )
@@ -80,7 +83,7 @@ def main(path: Path):
 
     validate_callbacks = callbacks.ValidateCallback(
         model,
-        tf_test_dataset,
+        tf_validate_dataset,
         every_n_epochs=options.validate.every_n_epochs,
         max_nrof_epochs=options.train.epoch.max_nrof_epochs,
         config=options.validate
@@ -102,9 +105,9 @@ def main(path: Path):
         ]
     )
 
-    network.save(options.model.path)
+    network.save(options.outdir)
 
-    logger.info('Model and logs have been saved to the directory %s', options.model.path)
+    logger.info('Model and logs have been saved to the directory {path}', path=options.outdir)
 
 
 if __name__ == '__main__':

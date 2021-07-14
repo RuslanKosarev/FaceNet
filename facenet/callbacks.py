@@ -3,6 +3,7 @@ __author__ = 'Ruslan N. Kosarev'
 
 from loguru import logger
 
+import numpy as np
 import tensorflow as tf
 
 from facenet import facenet
@@ -25,4 +26,4 @@ class ValidateCallback(tf.keras.callbacks.Callback):
             logger.info(f'perform validation for epoch {epoch1}')
 
             embeddings, labels = facenet.evaluate_embeddings(self._model, self.dataset)
-            statistics.FaceToFaceValidation(embeddings, labels, self.config.validate)
+            statistics.FaceToFaceValidation(embeddings, labels, self.config)

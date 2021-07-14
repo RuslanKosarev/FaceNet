@@ -202,29 +202,3 @@ def array2pil(image, mode='RGB'):
     output = Image.fromarray(image[:, :, index], mode=default_mode)
 
     return output
-
-
-def write_to_file(file, s, mode='w'):
-    file = Path(file).expanduser()
-    with file.open(mode=mode) as f:
-        f.write(s)
-
-
-def write_text_log(file, info):
-    info_str = 64 * '-' + '\n' + str(info)
-
-    if info_str[-1] != '\n':
-        info_str += '\n'
-
-    with file.open(mode='a') as f:
-        f.write(info_str)
-
-
-def glob_single_file(model_dir, pattern):
-    files = list(model_dir.glob(pattern))
-
-    if len(files) != 1:
-        raise ValueError(f'There should not be more than single files in the model directory {model_dir}.')
-
-    return files[0]
-

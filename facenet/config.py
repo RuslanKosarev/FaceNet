@@ -2,7 +2,7 @@
 __author__ = 'Ruslan N. Kosarev'
 
 import sys
-from typing import Union, List
+from typing import Union, List, Tuple
 from pathlib import Path
 from datetime import datetime
 from omegaconf import OmegaConf, DictConfig
@@ -127,7 +127,7 @@ class LoadConfigError(Exception):
     pass
 
 
-def load_config(app_file_name, file=None, keys: List[str] = None):
+def load_config(app_file_name, file=None, keys: Tuple[str, ...] = None):
     """Load configuration from the set of config files
     :param keys:
     :param app_file_name
@@ -215,7 +215,7 @@ def train_recognizer(path: PathType):
 
 
 def evaluate_embeddings(options):
-    keys = ['seed', 'batch_size', 'model', 'image', 'dataset']
+    keys = ('seed', 'batch_size', 'model', 'image', 'dataset')
     options = load_config(application_name(), options, keys)
 
     set_seed(options.seed)

@@ -14,11 +14,11 @@ from facenet.dataset import Database
 
 
 @click.command()
-@click.option('--config', type=Path, default=None,
+@click.option('-p', '--path', type=Path, default=None,
               help='Path to yaml config file with used options for the application.')
-def main(options: Path):
+def main(path: Path):
 
-    options = config.train_classifier(options)
+    options = config.train_classifier(path)
 
     return
 

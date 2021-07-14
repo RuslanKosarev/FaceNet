@@ -84,7 +84,7 @@ def binary_cross_entropy_loss(logits, cfg):
 
 
 @click.command()
-@click.option('--path', type=Path, default=None,
+@click.option('-p', '--path', type=Path, default=None,
               help='Path to yaml config file with used options for the application.')
 def main(path: Path):
 

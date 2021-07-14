@@ -12,10 +12,11 @@ from facenet.dataset import Database
 
 
 @click.command()
-@click.option('--options', type=Path, default=None,
-              help='Path to yaml config file with options for the application.')
-def main(options: Path):
-    options = config.evaluate_embeddings(options)
+@click.option('-p', '--path', type=Path, default=None,
+              help='Path to yaml config file with used options for the application.')
+def main(path: Path):
+
+    options = config.evaluate_embeddings(path)
 
     loader = facenet.ImageLoader(config=options.image)
     dataset = Database(options.dataset)

@@ -162,36 +162,36 @@ def load_config(app_file_name, file=None, keys: Tuple[str, ...] = None):
     return options
 
 
-def train_classifier(options):
-    cfg = load_config(application_name(), options)
+def train_classifier(path: PathType):
+    options = load_config(application_name(), path)
 
-    set_seed(cfg.seed)
+    set_seed(options.seed)
 
-    path = Path(cfg.model.path).expanduser()
-    cfg.model.path = path / subdir()
+    path = Path(options.model.path).expanduser()
+    options.model.path = path / subdir()
 
-    cfg.logs = Config()
-    cfg.logs.dir = cfg.model.path / 'logs'
-    cfg.logs.file = cfg.model.path.stem + '.log'
+    options.logs = Config()
+    options.logs.dir = options.model.path / 'logs'
+    options.logs.file = options.model.path.stem + '.log'
 
-    if cfg.model.checkpoint:
-        cfg.model.checkpoint = Path(cfg.model.checkpoint).expanduser()
+    if options.model.checkpoint:
+        options.model.checkpoint = Path(options.model.checkpoint).expanduser()
 
-    if not cfg.train.epoch.max_nrof_epochs:
-        cfg.train.epoch.max_nrof_epochs = cfg.train.learning_rate.schedule[-1][0]
+    if not options.train.epoch.max_nrof_epochs:
+        options.train.epoch.max_nrof_epochs = options.train.learning_rate.schedule[-1][0]
 
-    if cfg.validate:
-        cfg.validate.batch_size = cfg.batch_size
-        cfg.validate.image.size = cfg.image.size
-        cfg.validate.image.standardization = cfg.image.standardization
+    if options.validate:
+        options.validate.batch_size = options.batch_size
+        options.validate.image.size = options.image.size
+        options.validate.image.standardization = options.image.standardization
 
     # write arguments and some git revision info
-    ioutils.write_arguments(cfg, cfg.logs.dir)
-    ioutils.write_revision_info(cfg.logs.dir)
+    ioutils.write_arguments(options, options.logs.dir)
+    ioutils.write_revision_info(options.logs.dir)
 
     logging.configure_logging(options.outdir)
 
-    return cfg
+    return options
 
 
 def train_recognizer(path: PathType):

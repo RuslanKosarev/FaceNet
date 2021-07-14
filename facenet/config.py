@@ -28,7 +28,7 @@ default_model_path = Path(__file__).parents[1] / 'models/default'
 user_config = user_config_dir / 'config.yaml'
 default_train_config = default_config_dir / 'train_config.yaml'
 default_evaluate_embeddings_config = default_config_dir / 'evaluate_embeddings.yaml'
-default_train_recognizer_config = default_config_dir / 'train_recognizer_config.yaml'
+default_train_recognizer_config = default_config_dir / 'train_recognizer.yaml'
 
 
 def subdir() -> str:
@@ -40,7 +40,7 @@ def application_name():
 
 
 def config_paths(app_file_name, custom_config_file=None):
-    config_name = Path(app_file_name).stem + '_config.yaml'
+    config_name = Path(app_file_name).stem + '.yaml'
 
     paths = [
         default_config,

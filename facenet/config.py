@@ -2,7 +2,7 @@
 __author__ = 'Ruslan N. Kosarev'
 
 import sys
-from typing import Union
+from typing import Union, List
 from pathlib import Path
 from datetime import datetime
 from omegaconf import OmegaConf, DictConfig
@@ -127,8 +127,9 @@ class LoadConfigError(Exception):
     pass
 
 
-def load_config(app_file_name, file=None):
+def load_config(app_file_name, file=None, keys: List[str] = None):
     """Load configuration from the set of config files
+    :param keys:
     :param app_file_name
     :param file: Optional path to the custom config file
     :return: The validated config in Config model instance
@@ -152,10 +153,13 @@ def load_config(app_file_name, file=None):
     if new_cfg is None:
         raise LoadConfigError("The configuration has not been loaded.")
 
-    cfg = OmegaConf.to_container(cfg)
-    cfg = Config(cfg)
+    options = OmegaConf.to_container(cfg)
+    options = Config(options)
 
-    return cfg
+    if keys is not None:
+        options = Config({key: getattr(options, key) for key in keys})
+
+    return options
 
 
 def train_classifier(options):
@@ -211,17 +215,20 @@ def train_recognizer(path: PathType):
 
 
 def evaluate_embeddings(options):
-    options = load_config(application_name(), options)
+    keys = ['seed', 'batch_size', 'model', 'image', 'dataset']
+    options = load_config(application_name(), options, keys)
 
     set_seed(options.seed)
-
     options.model.path = Path(options.model.path).expanduser()
 
     if not options.outdir:
         outdir = options.model.path
         options.outdir = Path(outdir).expanduser() / Path(options.dataset.path).stem
+    options.outdir = Path(options.outdir).expanduser()
 
-    options.h5file = options.outdir / 'embeddings.h5'
+    if not options.h5file:
+        options.h5file = 'embeddings.h5'
+    options.h5file = options.outdir / options.h5file
 
     # write arguments and some git revision info
     ioutils.write_arguments(options.outdir, options)

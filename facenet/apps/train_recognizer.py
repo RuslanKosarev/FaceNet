@@ -28,14 +28,14 @@ class ConfusionMatrix:
         # evaluate confusion matrix block by block
         for i in range(nrof_classes):
             outs = model.predict(embeddings[i])
-            mean = np.mean(outs)
+            mean = tf.math.count_nonzero(outs).numpy() / (outs.shape[0] * outs.shape[1])
 
             tp += mean
             fn += 1 - mean
 
             for k in range(i):
                 outs = model.predict(embeddings[i], embeddings[k])
-                mean = np.mean(outs)
+                mean = tf.math.count_nonzero(outs).numpy() / (outs.shape[0] * outs.shape[1])
 
                 fp += mean
                 tn += 1 - mean
@@ -115,7 +115,7 @@ def main(model: Path):
 
     from omegaconf import DictConfig
     schedule = DictConfig({'value': None,
-                           'schedule': [[10, 0.01], [20, 0.001], [30, 0.0001]]
+                           'schedule': [[5, 0.01], [10, 0.001], [15, 0.0001]]
                            })
     nrof_epochs = schedule.schedule[-1][0]
 
@@ -135,8 +135,8 @@ def main(model: Path):
         print(f'Training loss (for one batch) {epoch}: {loss_value}')
         print(model.alpha.numpy(), model.threshold.numpy())
 
-    conf_mat = ConfusionMatrix(embeddings, model)
-    print(conf_mat)
+        conf_mat = ConfusionMatrix(embeddings, model)
+        print(conf_mat)
 
 
 if __name__ == '__main__':

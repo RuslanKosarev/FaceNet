@@ -19,7 +19,7 @@ def main(path: Path):
 
     options = config.evaluate_embeddings(path)
 
-    loader = facenet.ImageLoader(config=options.image)
+    loader = facenet.ImageLoader()
     dataset = Database(options.dataset)
     tf_dataset = dataset.tf_dataset_api(
         loader=loader,

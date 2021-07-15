@@ -1,13 +1,16 @@
 """Functions for building the face recognition network.
 """
 
-from typing import List
+from typing import List, Union
 from tqdm import tqdm
 from loguru import logger
+from pathlib import Path
 
 import random
 import numpy as np
 import tensorflow as tf
+
+PathType = Union[Path, str]
 
 
 def inputs(config):
@@ -15,11 +18,10 @@ def inputs(config):
 
 
 class ImageLoader:
-    def __init__(self, config=None):
-        self.height = config.size
-        self.width = config.size
+    def __init__(self):
+        pass
 
-    def __call__(self, path):
+    def __call__(self, path: PathType):
         contents = tf.io.read_file(path)
         image = tf.image.decode_image(contents, channels=3)
         return image

@@ -22,7 +22,7 @@ def main(path: Path):
 
     # ------------------------------------------------------------------------------------------------------------------
     # define train and test datasets
-    loader = facenet.ImageLoader(config=options.image)
+    loader = facenet.ImageLoader()
 
     train_dataset = Database(options.train.dataset)
     tf_train_dataset = train_dataset.tf_dataset_api(

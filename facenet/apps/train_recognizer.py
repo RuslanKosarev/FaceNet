@@ -1,4 +1,5 @@
-"""Train facenet recognizer.
+# coding:utf-8
+"""Train a face recognizer.
 """
 
 import click

@@ -1,4 +1,5 @@
-"""Validate a face recognizer.
+# coding:utf-8
+""" Evaluate embeddings.
 """
 
 

@@ -45,18 +45,18 @@ class ConfusionMatrix:
 
         self.accuracy = (tp + tn) / (tp + fp + tn + fn)
         self.precision = tp / (tp + fp)
-        self.tp_rate = tp / (tp + fn)
-        self.tn_rate = tn / (tn + fp)
+        self.sensitivity = tp / (tp + fn)
+        self.specificity = tn / (tn + fp)
 
     def __repr__(self):
         return (f'{type(self).__name__}\n' +
-                f'accuracy  {self.accuracy}\n' +
-                f'precision {self.precision}\n' +
-                f'tp rate   {self.tp_rate}\n' +
-                f'tn rate   {self.tn_rate}\n')
+                f'accuracy    {self.accuracy}\n' +
+                f'precision   {self.precision}\n' +
+                f'sensitivity {self.sensitivity}\n' +
+                f'specificity {self.specificity}\n')
 
 
-def binary_cross_entropy_loss(logits, cfg):
+def binary_cross_entropy_loss(logits, cfg, pos_weight=1):
     # define upper-triangle indices
     batch_size = cfg.nrof_classes_per_batch * cfg.nrof_examples_per_class
     triu_indices = [(i, k) for i, k in zip(*np.triu_indices(batch_size, k=1))]

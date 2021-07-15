@@ -13,7 +13,6 @@ import datetime
 import tensorflow as tf
 from PIL import Image
 from subprocess import Popen, PIPE
-from facenet import config, h5utils
 
 PathType = Union[Path, str]
 
@@ -86,9 +85,9 @@ def write_arguments(path: PathType, cfg, mode: str = 'w'):
         f.write('{}\n'.format(str(cfg)))
 
 
-def write_image(image, file, prefix=None, mode='RGB'):
+def write_image(image, file: PathType, prefix: PathType = None, mode='RGB'):
     if prefix is not None:
-        file = Path(prefix).joinpath(file)
+        file = Path(prefix) / file
     file = Path(file).expanduser()
 
     if not file.parent.exists():

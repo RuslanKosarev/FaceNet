@@ -86,10 +86,12 @@ def write_arguments(path: PathType, cfg, mode: str = 'w'):
         f.write('{}\n'.format(str(cfg)))
 
 
-def write_image(image, filename, prefix=None, mode='RGB'):
+def write_image(image, file, prefix=None, mode='RGB'):
     if prefix is not None:
-        filename = Path(prefix).joinpath(filename)
-    filename = Path(filename).expanduser()
+        file = Path(prefix).joinpath(file)
+    file = Path(file).expanduser()
+
+    file.parent.mkdir(parents=True)
 
     if isinstance(image, np.ndarray):
         image = array2pil(image, mode=mode)
@@ -97,8 +99,8 @@ def write_image(image, filename, prefix=None, mode='RGB'):
         # to avoid some warnings while tf reads saved files
         image = array2pil(pil2array(image))
 
-    if image.save(str(filename)):
-        raise IOError('while writing the file {}'.format(filename))
+    if image.save(str(file)):
+        raise IOError('while writing the file {}'.format(file))
 
 
 def read_image(file, prefix=None):

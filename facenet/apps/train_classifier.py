@@ -32,8 +32,8 @@ def main(path: Path):
         buffer_size=10
     )
 
-    test_dataset = Database(options.validate.dataset)
-    tf_validate_dataset = test_dataset.tf_dataset_api(
+    validate_dataset = Database(options.validate.dataset)
+    tf_validate_dataset = validate_dataset.tf_dataset_api(
         loader=loader,
         batch_size=options.batch_size,
         repeat=False,

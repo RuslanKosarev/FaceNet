@@ -91,7 +91,8 @@ def write_image(image, file, prefix=None, mode='RGB'):
         file = Path(prefix).joinpath(file)
     file = Path(file).expanduser()
 
-    file.parent.mkdir(parents=True)
+    if not file.parent.exists():
+        makedirs(file.parent)
 
     if isinstance(image, np.ndarray):
         image = array2pil(image, mode=mode)

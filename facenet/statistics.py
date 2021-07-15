@@ -189,12 +189,12 @@ class Report:
         dct = {'auc': -1, 'eer': -1}
         try:
             dct['auc'] = sklearn.metrics.auc(1 - tn_rates, tp_rates)
-        except:
+        except Exception as err:
             pass
 
         try:
             dct['eer'] = brentq(lambda x: 1. - x - interpolate.interp1d(1 - tn_rates, tp_rates)(x), 0., 1.)
-        except:
+        except Exception as err:
             pass
 
         def get(name):

@@ -56,7 +56,7 @@ class ConfusionMatrix:
                 f'specificity {self.specificity}\n')
 
 
-def binary_cross_entropy_loss(logits, cfg, pos_weight=1):
+def binary_cross_entropy_loss(logits, cfg):
     # define upper-triangle indices
     batch_size = cfg.nrof_classes_per_batch * cfg.nrof_examples_per_class
     triu_indices = [(i, k) for i, k in zip(*np.triu_indices(batch_size, k=1))]

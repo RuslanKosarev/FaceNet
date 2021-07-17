@@ -56,11 +56,11 @@ def detect_faces(files, detector):
         try:
             # this function returns PIL.Image object
             img = ioutils.read_image(image_path)
-            img_array = ioutils.pil2array(img)
+            img = ioutils.pil2array(img)
         except Exception as e:
             continue
 
-        boxes = detector.detect_faces(img_array)
+        boxes = detector.detect_faces(img)
 
         if len(boxes) != 1:
             continue
@@ -74,9 +74,9 @@ def detect_faces(files, detector):
             'right': box.right,
             'top': box.top,
             'bottom': box.bottom,
-            'shape0': img_array.shape[0],
-            'shape1': img_array.shape[1],
-            'shape2': img_array.shape[2] if img_array.ndim == 3 else None,
+            'shape0': img.shape[0],
+            'shape1': img.shape[1],
+            'shape2': img.shape[2] if img.ndim == 3 else None,
             'confidence': confidence,
         }, name=key)
 

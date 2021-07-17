@@ -11,6 +11,8 @@ image:
   size: 160
   # Performs normalization of images
   normalization: 0
+  # Minimal size of detected faces in pixels
+  min_face_size: 64
 
 # Model definition
 model:

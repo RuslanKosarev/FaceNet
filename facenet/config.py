@@ -64,7 +64,7 @@ def set_seed(seed):
     """
     random.seed(seed)
     np.random.seed(seed)
-    tf.random.set_seed(seed)
+#    tf.random.set_seed(seed)
 
 
 class Config:
@@ -233,6 +233,33 @@ def evaluate_embeddings(options):
     logging.configure_logging(options.outdir)
 
     return options
+
+
+def detect_faces(options):
+    options = load_config(application_name(), options)
+
+    set_seed(options.seed)
+
+    if not options.outdir:
+        path = Path(options.dataset.path).expanduser()
+        options.outdir = f'{path}_extracted_faces_{options.image.size}'
+    options.outdir = Path(options.outdir).expanduser()
+
+    if not options.h5file:
+        options.h5file = options.outdir.joinpath('boxes.h5')
+    options.h5file = options.outdir / options.h5file
+
+    # write arguments and some git revision info
+    ioutils.write_arguments(options.outdir, options)
+    ioutils.write_revision_info(options.outdir)
+
+    logging.configure_logging(options.outdir)
+
+    return options
+
+
+
+
 
 
 

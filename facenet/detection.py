@@ -58,29 +58,29 @@ def detect_faces(files, detector):
             img = ioutils.read_image(image_path)
             img_array = ioutils.pil2array(img)
         except Exception as e:
-            pass
-        else:
-            boxes = detector.detect_faces(img_array)
+            continue
 
-            if len(boxes) != 1:
-                continue
+        boxes = detector.detect_faces(img_array)
 
-            box = boxes[0]['box']
-            confidence = boxes[0]['confidence']
-            box = BoundingBox(left=box[0], top=box[1], width=box[2], height=box[3], confidence=confidence)
+        if len(boxes) != 1:
+            continue
 
-            series = pd.Series({
-                'left': box.left,
-                'right': box.right,
-                'top': box.top,
-                'bottom': box.bottom,
-                'shape0': img_array.shape[0],
-                'shape1': img_array.shape[1],
-                'shape2': img_array.shape[2] if img_array.ndim == 3 else None,
-                'confidence': confidence,
-            }, name=key)
+        box = boxes[0]['box']
+        confidence = boxes[0]['confidence']
+        box = BoundingBox(left=box[0], top=box[1], width=box[2], height=box[3], confidence=confidence)
 
-            df = pd.concat([df, series], axis=1)
+        series = pd.Series({
+            'left': box.left,
+            'right': box.right,
+            'top': box.top,
+            'bottom': box.bottom,
+            'shape0': img_array.shape[0],
+            'shape1': img_array.shape[1],
+            'shape2': img_array.shape[2] if img_array.ndim == 3 else None,
+            'confidence': confidence,
+        }, name=key)
+
+        df = pd.concat([df, series], axis=1)
 
     df = df.transpose()
 

@@ -1,4 +1,4 @@
-"""Performs face alignment and stores face thumbnails in the output directory."""
+""" Detect faces and store face thumbnails in the output directory."""
 
 import click
 from pathlib import Path

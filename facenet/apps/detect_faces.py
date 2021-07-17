@@ -26,7 +26,6 @@ def main(path: Path):
     for i, cls in tqdm(enumerate(dbase.classes), total=dbase.nrof_classes):
         with h5py.File(str(options.h5file), mode='a') as hf:
             if cls.name in hf:
-                print(cls.name)
                 continue
 
         df = detection.detect_faces(cls.files, detector)

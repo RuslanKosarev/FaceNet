@@ -4,6 +4,7 @@ import click
 from pathlib import Path
 from tqdm import tqdm
 from mtcnn import MTCNN
+from mtcnn_cv2 import MTCNN
 
 from facenet import dataset
 from facenet import config
@@ -23,7 +24,7 @@ def main(path: Path):
 
     detector = MTCNN(min_face_size=options.image.min_face_size)
 
-    for i, cls in tqdm(enumerate(dbase.classes), total=dbase.nrof_classes):
+    for cls in tqdm(dbase.classes):
         with h5py.File(str(options.h5file), mode='a') as hf:
             if cls.name in hf:
                 continue

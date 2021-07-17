@@ -258,6 +258,14 @@ keras = ">=2.0.0"
 opencv-python = ">=4.1.0"
 
 [[package]]
+name = "mtcnn-opencv"
+version = "1.0.2"
+description = "MTCNN face detection using OpenCV"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "numexpr"
 version = "2.7.3"
 description = "Fast numerical expression evaluator for NumPy"
@@ -662,7 +670,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "26cd13717ea304256d98a2be65ca9e07a0b085294982f3a82077010d83701ea1"
+content-hash = "3565f052a046ec5870b87f730106539d7ea04455e62830831430098deba5fd43"
 
 [metadata.files]
 absl-py = [
@@ -810,6 +818,9 @@ markdown = [
 mtcnn = [
     {file = "mtcnn-0.1.1-py3-none-any.whl", hash = "sha256:fd69d2f4dd10647dd7481a53b9586e805f35a17c61ac78ba472a7f53766eb86e"},
     {file = "mtcnn-0.1.1.tar.gz", hash = "sha256:d0957274584be62cb83d4a089041f8ee3cf3b1893e45f01ed3356f94a381302b"},
+]
+mtcnn-opencv = [
+    {file = "mtcnn_opencv-1.0.2-py3-none-any.whl", hash = "sha256:219e9beb241739166c006c427f9f05cb4fe9fad7fb386ed91216af1b945fb3d2"},
 ]
 numexpr = [
     {file = "numexpr-2.7.3-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:74df157ab4577bfc83c14f4e39d14781b06ade5406d3efef049f90c88d8c28ea"},

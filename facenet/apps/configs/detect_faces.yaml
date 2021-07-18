@@ -10,6 +10,11 @@ dataset:
   # Maximal number of images per class to download from class
   max_nrof_images:
 
+image:
+  # crop image
+  crop: true
+  # resize image
+  resize: false
 
 outdir:
 

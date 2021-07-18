@@ -8,7 +8,7 @@ from tqdm import tqdm
 from mtcnn import MTCNN
 from mtcnn_cv2 import MTCNN
 
-from facenet import dataset
+from facenet import dataset, ioutils
 from facenet import config
 from loguru import logger
 import h5py
@@ -33,9 +33,24 @@ def main(path: Path):
             h5_keys = list(hf.keys())
 
     for cls in tqdm(dbase.classes):
-        if cls.name not in h5_keys:
+        key = cls.name
+
+        if key not in h5_keys:
             df = detection.detect_faces(cls.files, detector)
-            df.to_hdf(options.h5file, key=cls.name, mode='a')
+            df.to_hdf(options.h5file, key=key, mode='a')
+        else:
+            df = pd.read_hdf(options.h5file, key=key)
+
+        for image_path in cls.files:
+            image_path = Path(image_path)
+            image_index = f'{image_path.parent.name}/{image_path.stem}'
+
+            if image_index in df.index:
+                image = ioutils.read_image(image_path)
+                image = detection.image_processing(image, df.loc[image_index], options.image)
+
+                path = options.outdir / f'{image_index}.png'
+                ioutils.write_image(image, path)
 
     logger.info('output directory {outdir}', outdir=options.outdir)
 

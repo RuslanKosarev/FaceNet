@@ -29,20 +29,33 @@ def image_processing(image, box, options):
     if not isinstance(image, Image.Image):
         raise ValueError('Input must be PIL.Image')
 
-    w_margin = round(box.width * options.margin / 2)
-    h_margin = round(box.height * options.margin / 2)
+    left = box['left']
+    right = box['right']
+    top = box['top']
+    bottom = box['bottom']
 
-    cropped = image.crop((box.left - w_margin, box.top - h_margin, box.right + w_margin, box.bottom + h_margin))
+    if options.margin:
+        width = right - left
+        height = bottom - top
+        w_margin = round(width * options.margin / 2)
+        h_margin = round(height * options.margin / 2)
+    else:
+        w_margin = 0
+        h_margin = 0
 
-    # compute size of the output image
-    width = math.ceil(options.size + options.size * options.margin)
-    height = math.ceil(options.size + options.size * options.margin)
-    size = (width, height)
+    # crop image
+    if options.crop:
+        image = image.crop((left - w_margin, top - h_margin, right + w_margin, bottom + h_margin))
 
-    # resize input image
-    resized = cropped.resize(size, Image.ANTIALIAS)
+    # resize image
+    if options.resize:
+        width = math.ceil(options.size + options.size * options.margin)
+        height = math.ceil(options.size + options.size * options.margin)
+        size = (width, height)
 
-    return resized
+        image = image.resize(size, Image.ANTIALIAS)
+
+    return image
 
 
 def detect_faces(files, detector):

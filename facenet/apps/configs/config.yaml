@@ -13,6 +13,8 @@ image:
   normalization: 0
   # Minimal size of detected faces in pixels
   min_face_size: 64
+  # Add margin to crop image
+  margin:
 
 # Model definition
 model:

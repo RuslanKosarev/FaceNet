@@ -40,6 +40,8 @@ def main(path: Path):
         else:
             df = pd.read_hdf(options.h5file, key=key)
 
+        df = df[df['size'] >= options.image.min_face_size]
+
         for image_path in cls.files:
             image_path = Path(image_path)
             image_index = f'{image_path.parent.name}/{image_path.stem}'

@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pandas as pd
 from tqdm import tqdm
-from mtcnn import MTCNN
 from mtcnn_cv2 import MTCNN
 
 from facenet import dataset, ioutils
@@ -52,6 +51,8 @@ def main(path: Path):
                 path = options.outdir / f'{image_index}.png'
                 ioutils.write_image(image, path)
 
+    options.dataset.path = options.outdir
+    dataset.Database(options.dataset)
     logger.info('output directory {outdir}', outdir=options.outdir)
 
 

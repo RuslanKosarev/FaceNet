@@ -11,14 +11,15 @@ from facenet import ioutils
 
 class BoundingBox:
     def __init__(self, left, top, width, height, confidence=None):
-        self.left = int(np.round(left))
-        self.right = int(np.round(left + width))
-
-        self.top = int(np.round(top))
-        self.bottom = int(np.round(top + height))
+        self.left = left
+        self.right = left + width
+        self.top = top
+        self.bottom = top + height
 
         self.width = self.right - self.left
         self.height = self.bottom - self.top
+        self.size = self.width * self.height
+
         self.confidence = confidence
 
     def __repr__(self):
@@ -35,13 +36,14 @@ def image_processing(image, box, options):
     bottom = box['bottom']
 
     if options.margin:
-        width = right - left
-        height = bottom - top
-        w_margin = round(width * options.margin / 2)
-        h_margin = round(height * options.margin / 2)
+        margin = options.margin
     else:
-        w_margin = 0
-        h_margin = 0
+        margin = 0
+
+    width = right - left
+    height = bottom - top
+    w_margin = width * margin / 2
+    h_margin = height * margin / 2
 
     # crop image
     if options.crop:
@@ -49,8 +51,8 @@ def image_processing(image, box, options):
 
     # resize image
     if options.resize:
-        width = math.ceil(options.size + options.size * options.margin)
-        height = math.ceil(options.size + options.size * options.margin)
+        width = math.ceil(options.size + options.size * margin)
+        height = math.ceil(options.size + options.size * margin)
         size = (width, height)
 
         image = image.resize(size, Image.ANTIALIAS)
@@ -78,15 +80,17 @@ def detect_faces(files, detector):
         if len(boxes) != 1:
             continue
 
-        box = boxes[0]['box']
+        left, top, width, height = boxes[0]['box']
         confidence = boxes[0]['confidence']
-        box = BoundingBox(left=box[0], top=box[1], width=box[2], height=box[3], confidence=confidence)
+
+        box = BoundingBox(left=left, top=top, width=width, height=height, confidence=confidence)
 
         series = pd.Series({
             'left': box.left,
             'right': box.right,
             'top': box.top,
             'bottom': box.bottom,
+            'size': box.size,
             'shape0': img.shape[0],
             'shape1': img.shape[1],
             'shape2': img.shape[2] if img.ndim == 3 else None,

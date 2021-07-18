@@ -2,6 +2,8 @@
 
 import click
 from pathlib import Path
+
+import pandas as pd
 from tqdm import tqdm
 from mtcnn import MTCNN
 from mtcnn_cv2 import MTCNN
@@ -24,13 +26,16 @@ def main(path: Path):
 
     detector = MTCNN(min_face_size=options.image.min_face_size)
 
-    for cls in tqdm(dbase.classes):
-        with h5py.File(str(options.h5file), mode='a') as hf:
-            if cls.name in hf:
-                continue
+    if not options.h5file.exists():
+        h5_keys = []
+    else:
+        with h5py.File(str(options.h5file), mode='r') as hf:
+            h5_keys = list(hf.keys())
 
-        df = detection.detect_faces(cls.files, detector)
-        df.to_hdf(str(options.h5file), key=cls.name, mode='a')
+    for cls in tqdm(dbase.classes):
+        if cls.name not in h5_keys:
+            df = detection.detect_faces(cls.files, detector)
+            df.to_hdf(options.h5file, key=cls.name, mode='a')
 
     logger.info('output directory {outdir}', outdir=options.outdir)
 

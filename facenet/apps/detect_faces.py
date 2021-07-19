@@ -48,8 +48,7 @@ def main(path: Path):
         df = df[df['size'] >= options.image.min_face_size]
 
         for image_path in cls.files:
-            image_path = Path(image_path)
-            image_index = f'{image_path.parent.name}/{image_path.stem}'
+            image_index = detection.df_index(image_path)
 
             if image_index in df.index:
                 image = ioutils.read_image(image_path)

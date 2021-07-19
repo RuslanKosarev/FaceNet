@@ -26,6 +26,16 @@ class BoundingBox:
         return f'left {self.left}, top {self.top}, width {self.width}, height {self.height}, confidence {self.confidence}'
 
 
+def df_index(image_path):
+    image_path = Path(image_path)
+
+    parent = re.sub('[^A-Za-z0-9]', '', image_path.parent.name)
+    name = re.sub('[^A-Za-z0-9]', '', image_path.stem)
+    index = f'{parent}/{name}'
+
+    return index
+
+
 def image_processing(image, box, options):
     if not isinstance(image, Image.Image):
         raise ValueError('Input must be PIL.Image')
@@ -82,9 +92,6 @@ def detect_faces(files, detector):
         left, top, width, height = boxes[0]['box']
         confidence = boxes[0]['confidence']
 
-        parent = re.sub('[^A-Za-z0-9]', '', image_path.parent.name)
-        name = re.sub('[^A-Za-z0-9]', '', image_path.stem)
-        name = f'{parent}/{name}'
         box = BoundingBox(left=left, top=top, width=width, height=height, confidence=confidence)
 
         series = pd.Series({
@@ -97,7 +104,7 @@ def detect_faces(files, detector):
             'shape1': img.shape[1],
             'shape2': img.shape[2] if img.ndim == 3 else None,
             'confidence': confidence,
-        }, name=name)
+        }, name=df_index(image_path))
 
         df = pd.concat([df, series], axis=1)
 

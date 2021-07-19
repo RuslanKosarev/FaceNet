@@ -40,6 +40,9 @@ def main(path: Path):
         else:
             df = pd.read_hdf(options.h5file, key=key)
 
+        if df.empty:
+            continue
+
         df = df[df['size'] >= options.image.min_face_size]
 
         for image_path in cls.files:

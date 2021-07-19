@@ -1,7 +1,7 @@
 # coding:utf-8
 
+import re
 from pathlib import Path
-import numpy as np
 import pandas as pd
 from PIL import Image
 import math
@@ -66,7 +66,6 @@ def detect_faces(files, detector):
 
     for image_path in files:
         image_path = Path(image_path)
-        key = f'{image_path.parent.name}/{image_path.stem}'.replace(' ', '')
 
         try:
             # this function returns PIL.Image object
@@ -83,6 +82,9 @@ def detect_faces(files, detector):
         left, top, width, height = boxes[0]['box']
         confidence = boxes[0]['confidence']
 
+        parent = re.sub('[^A-Za-z0-9]', '', image_path.parent.name)
+        name = re.sub('[^A-Za-z0-9]', '', image_path.stem)
+        name = f'{parent}/{name}'
         box = BoundingBox(left=left, top=top, width=width, height=height, confidence=confidence)
 
         series = pd.Series({
@@ -95,7 +97,7 @@ def detect_faces(files, detector):
             'shape1': img.shape[1],
             'shape2': img.shape[2] if img.ndim == 3 else None,
             'confidence': confidence,
-        }, name=key)
+        }, name=name)
 
         df = pd.concat([df, series], axis=1)
 

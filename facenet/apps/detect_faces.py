@@ -2,6 +2,7 @@
 
 import click
 from pathlib import Path
+import re
 
 import pandas as pd
 from tqdm import tqdm
@@ -32,7 +33,7 @@ def main(path: Path):
             h5_keys = list(hf.keys())
 
     for cls in tqdm(dbase.classes):
-        key = cls.name.replace(' ', '')
+        key = re.sub('[^A-Za-z0-9]', '', cls.name)
 
         if key not in h5_keys:
             df = detection.detect_faces(cls.files, detector)

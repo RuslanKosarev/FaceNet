@@ -242,7 +242,7 @@ def detect_faces(options):
 
     if not options.outdir:
         path = Path(options.dataset.path).expanduser()
-        options.outdir = f'{path}_extracted_faces_{options.image.size}'
+        options.outdir = f'{path}_extracted_faces'
     options.outdir = Path(options.outdir).expanduser()
 
     if not options.h5file:

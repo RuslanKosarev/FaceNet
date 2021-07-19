@@ -66,7 +66,7 @@ def detect_faces(files, detector):
 
     for image_path in files:
         image_path = Path(image_path)
-        key = f'{image_path.parent.name}/{image_path.stem}'
+        key = f'{image_path.parent.name}/{image_path.stem}'.replace(' ', '')
 
         try:
             # this function returns PIL.Image object

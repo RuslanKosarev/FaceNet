@@ -23,7 +23,7 @@ def main(path: Path):
     options = config.detect_faces(path)
     dbase = dataset.Database(options.dataset)
 
-    detector = MTCNN(min_face_size=options.image.min_face_size)
+    detector = MTCNN()
 
     if not options.h5file.exists():
         h5_keys = []
@@ -32,7 +32,7 @@ def main(path: Path):
             h5_keys = list(hf.keys())
 
     for cls in tqdm(dbase.classes):
-        key = cls.name
+        key = cls.name.replace(' ', '')
 
         if key not in h5_keys:
             df = detection.detect_faces(cls.files, detector)

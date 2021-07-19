@@ -36,7 +36,8 @@ def main(path: Path):
 
         if key not in h5_keys:
             df = detection.detect_faces(cls.files, detector)
-            df.to_hdf(options.h5file, key=key, mode='a')
+            if not df.empty:
+                df.to_hdf(options.h5file, key=key, mode='a')
         else:
             df = pd.read_hdf(options.h5file, key=key)
 

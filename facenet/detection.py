@@ -56,16 +56,14 @@ def image_processing(image, box, options):
     h_margin = height * margin / 2
 
     # crop image
-    if options.crop:
-        image = image.crop((left - w_margin, top - h_margin, right + w_margin, bottom + h_margin))
+    image = image.crop((left - w_margin, top - h_margin, right + w_margin, bottom + h_margin))
 
     # resize image
-    if options.resize:
-        width = math.ceil(options.size + options.size * margin)
-        height = math.ceil(options.size + options.size * margin)
-        size = (width, height)
+    width = math.ceil(options.size + options.size * margin)
+    height = math.ceil(options.size + options.size * margin)
+    size = (width, height)
 
-        image = image.resize(size, Image.ANTIALIAS)
+    image = image.resize(size, Image.ANTIALIAS)
 
     return image
 

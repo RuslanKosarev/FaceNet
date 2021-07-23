@@ -245,8 +245,7 @@ def detect_faces(options):
         options.outdir = f'{path}_extracted_faces'
     options.outdir = Path(options.outdir).expanduser()
 
-    if not options.h5file:
-        options.h5file = options.outdir.joinpath('boxes.h5')
+    options.h5file = options.outdir.joinpath('boxes.h5')
     options.h5file = options.outdir / options.h5file
 
     # write arguments and some git revision info

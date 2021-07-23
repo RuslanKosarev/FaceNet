@@ -26,12 +26,6 @@ def main(path: Path):
 
     detector = MTCNN()
 
-    if not options.h5file.exists():
-        h5_keys = []
-    else:
-        with h5py.File(str(options.h5file), mode='r') as hf:
-            h5_keys = list(hf.keys())
-
     for cls in tqdm(dbase.classes):
         key = re.sub('[^A-Za-z0-9]', '', cls.name)
 

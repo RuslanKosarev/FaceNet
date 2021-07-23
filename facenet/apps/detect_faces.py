@@ -30,7 +30,6 @@ def main(path: Path):
         key = re.sub('[^A-Za-z0-9]', '', cls.name)
 
         df = detection.detect_faces(cls.files, detector)
-
         if df.empty:
             continue
 

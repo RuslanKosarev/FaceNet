@@ -35,16 +35,12 @@ def main(path: Path):
     for cls in tqdm(dbase.classes):
         key = re.sub('[^A-Za-z0-9]', '', cls.name)
 
-        if key not in h5_keys:
-            df = detection.detect_faces(cls.files, detector)
-            if not df.empty:
-                df.to_hdf(options.h5file, key=key, mode='a')
-        else:
-            df = pd.read_hdf(options.h5file, key=key)
+        df = detection.detect_faces(cls.files, detector)
 
         if df.empty:
             continue
 
+        df.to_hdf(options.h5file, key=key, mode='a')
         df = df[df['size'] >= options.image.min_face_size]
 
         for image_path in cls.files:

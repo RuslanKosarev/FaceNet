@@ -27,6 +27,8 @@ train:
 
 ## Config for validation
 validate:
+  every_n_epochs: 10
+
   dataset:
     # Path to the directory with aligned face images to validate facenet.
     path: ~/datasets/megaface/megaface_extracted_160

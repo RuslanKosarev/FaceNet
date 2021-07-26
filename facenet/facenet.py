@@ -18,12 +18,14 @@ def inputs(config):
 
 
 class ImageLoader:
-    def __init__(self):
-        pass
+    def __init__(self, config):
+        self.height = config.size
+        self.width = config.size
 
     def __call__(self, path: PathType):
         contents = tf.io.read_file(path)
         image = tf.image.decode_image(contents, channels=3)
+        image = tf.image.resize_with_crop_or_pad(image, self.height, self.width)
         return image
 
 

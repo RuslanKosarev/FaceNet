@@ -54,8 +54,6 @@ regularizer = {
 }
 
 batch_normalization = {
-    'momentum': 0.99,
-    'epsilon': 0.001,
     'fused': False,
     'trainable': True,
     'center': True,

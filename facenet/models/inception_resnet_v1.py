@@ -57,7 +57,7 @@ batch_normalization = {
     'fused': False,
     'trainable': True,
     'center': True,
-    'scale': True
+    'scale': False
 }
 
 kernel_regularizer = tf.keras.regularizers.L2(0.0005)

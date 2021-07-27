@@ -3,7 +3,7 @@
 train:
   dataset:
     # Path to the directory with aligned face images to train facenet.
-    path: ~/datasets/vggface2/train_extracted_160
+    path: ~/datasets/vggface2/vggface2_extracted_faces
     # Number of classes to download from data set
     nrof_classes:
     # Minimal number of images per class to download from class
@@ -31,13 +31,13 @@ validate:
 
   dataset:
     # Path to the directory with aligned face images to validate facenet.
-    path: ~/datasets/megaface/megaface_extracted_160
+    path: ~/datasets/megaface/megaface_extracted_faces
     # Number of classes to download from data set
     nrof_classes:
     # Minimal number of images per class to download from class
     min_nrof_images:
     # Maximal number of images per class to download from class
-    max_nrof_images:
+    max_nrof_images: 50
 
   # Number of folds to use for cross validation. Mainly used for testing
   nrof_folds: 10

@@ -62,6 +62,7 @@ batch_normalization = {
 
 kernel_regularizer = tf.keras.regularizers.L2(0.0005)
 kernel_initializer = tf.keras.initializers.GlorotUniform()
+dropout_rate = 0.05
 
 
 def check_input_config(cfg=None):
@@ -463,6 +464,7 @@ class InceptionResnetV1(keras.Model):
         self.features = tf.keras.Sequential(name='features', layers=[
             AvgPool2D([3, 3], padding='valid', name='AvgPool_1a_8x8'),
             Flatten(),
+            Dropout(dropout_rate),
             Dense(config.size, activation=None, use_bias=False,
                   kernel_initializer=kernel_initializer,
                   kernel_regularizer=kernel_regularizer,

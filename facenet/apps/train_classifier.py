@@ -56,6 +56,7 @@ def main(path: Path):
             activation=None,
             kernel_initializer=tf.keras.initializers.GlorotUniform(),
             kernel_regularizer=kernel_regularizer,
+            use_bias=True,
             bias_initializer='zeros',
             bias_regularizer=None,
             name='logits'

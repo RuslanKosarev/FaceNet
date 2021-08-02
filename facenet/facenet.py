@@ -105,7 +105,7 @@ def evaluate_embeddings(model, tf_dataset):
 
     for image_batch, label_batch in tqdm(tf_dataset):
         embeddings.append(model(image_batch).numpy())
-        labels.append(label_batch)
+        labels.append(label_batch.numpy())
 
     return np.concatenate(embeddings), np.concatenate(labels)
 

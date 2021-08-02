@@ -2,8 +2,6 @@
 __author__ = 'Ruslan N. Kosarev'
 
 from loguru import logger
-
-import numpy as np
 import tensorflow as tf
 
 from facenet import facenet

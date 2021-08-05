@@ -86,7 +86,7 @@ class Block35(keras.layers.Layer):
         self.config = check_input_config(config)
         self.mixed_activation = tf.keras.activations.deserialize('relu')
 
-        self.scale = tf.Variable(1, name='Block35/scale', trainable=True, dtype=tf.float32)
+        self.scale = tf.Variable(0, name='Block35/scale', trainable=True, dtype=tf.float32)
 
         self.tower_conv0 = tf.keras.Sequential([
             Conv2D(32, 1, strides=1, padding='same', activation=None, use_bias=False,
@@ -158,7 +158,7 @@ class Block17(keras.layers.Layer):
         self.config = check_input_config(config)
         self.mixed_activation = tf.keras.activations.deserialize('relu')
 
-        self.scale = tf.Variable(1, name='Block17/scale', trainable=True, dtype=tf.float32)
+        self.scale = tf.Variable(0, name='Block17/scale', trainable=True, dtype=tf.float32)
 
         self.tower_conv0 = tf.keras.Sequential([
             Conv2D(128, 1, strides=1, padding='same', activation=None, use_bias=False,
@@ -215,7 +215,7 @@ class Block8(keras.layers.Layer):
         self.config = check_input_config(config)
         self.mixed_activation = tf.keras.activations.deserialize(self.config.activation)
 
-        self.scale = tf.Variable(1, name='Block8/scale', trainable=True, dtype=tf.float32)
+        self.scale = tf.Variable(0, name='Block8/scale', trainable=True, dtype=tf.float32)
 
         self.tower_conv0 = tf.keras.Sequential([
             Conv2D(192, 1, strides=1, padding='same', activation=None, use_bias=False,

@@ -71,6 +71,8 @@ def main(path: Path):
         network.load_weights(checkpoint)
 
     # ------------------------------------------------------------------------------------------------------------------
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=options.logdir)
+
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=options.outdir / options.outdir.stem,
         save_weights_only=True,
@@ -90,8 +92,6 @@ def main(path: Path):
         config=options.validate
     )
 
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=options.logdir)
-
     network.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         optimizer=tf.keras.optimizers.Adam(epsilon=0.1)
@@ -102,10 +102,10 @@ def main(path: Path):
         epochs=options.train.epoch.max_nrof_epochs,
         steps_per_epoch=options.train.epoch.size,
         callbacks=[
+            tensorboard_callback,
             checkpoint_callback,
             learning_rate_callback,
             validate_callbacks,
-            tensorboard_callback,
         ]
     )
 
